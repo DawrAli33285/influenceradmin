@@ -9,10 +9,15 @@ import {
 } from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
 import SellerAdminHeader from './components/header';
+import UserDetail from './userdetail';
 const router = createBrowserRouter([
   {
     path: "/usermanagment",
     element: <SellerAdminHeader><App /></SellerAdminHeader>,
+  },
+  {
+    path: "/userdetail",
+    element: <SellerAdminHeader><UserDetail /></SellerAdminHeader>,
   },
 ]);
 const root = ReactDOM.createRoot(document.getElementById('root'));
