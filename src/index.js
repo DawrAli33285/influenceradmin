@@ -10,14 +10,19 @@ import {
 import reportWebVitals from './reportWebVitals';
 import SellerAdminHeader from './components/header';
 import UserDetail from './userdetail';
+import BondManagment from './bondmanagment';
 const router = createBrowserRouter([
   {
     path: "/usermanagment",
     element: <SellerAdminHeader><App /></SellerAdminHeader>,
   },
   {
-    path: "/userdetail",
+    path: "/userdetail/:useremail",
     element: <SellerAdminHeader><UserDetail /></SellerAdminHeader>,
+  },
+  {
+    path: "/bondmanagement",
+    element: <SellerAdminHeader><BondManagment /></SellerAdminHeader>,
   },
 ]);
 const root = ReactDOM.createRoot(document.getElementById('root'));
