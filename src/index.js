@@ -11,6 +11,7 @@ import reportWebVitals from './reportWebVitals';
 import SellerAdminHeader from './components/header';
 import UserDetail from './userdetail';
 import BondManagment from './bondmanagment';
+import BondDetail from './bond-detail';
 const router = createBrowserRouter([
   {
     path: "/usermanagment",
@@ -24,6 +25,11 @@ const router = createBrowserRouter([
     path: "/bondmanagement",
     element: <SellerAdminHeader><BondManagment /></SellerAdminHeader>,
   },
+  {
+    path: "/bond-detail/:bondid",
+    element: <SellerAdminHeader><BondDetail /></SellerAdminHeader>,
+  },
+  
 ]);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

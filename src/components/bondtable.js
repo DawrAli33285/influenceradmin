@@ -3,6 +3,7 @@ import { MoonLoader } from 'react-spinners';
 import { ToastContainer } from 'react-toastify';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 export default function BondTable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
@@ -179,7 +180,7 @@ export default function BondTable() {
                                                 <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                     <ul>
                                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Edit</li>
+                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to = {`/bond-detail/${user.bondID}`}>Edit</Link></li>
                                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
                                                         <li className="px-4 py-2 hover:bg-gray-100 text-red-500 cursor-pointer">Delete</li>
                                                     </ul>
