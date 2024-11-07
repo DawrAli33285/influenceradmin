@@ -1,10 +1,17 @@
 import { useParams } from "react-router-dom"
 import { useDropzone } from 'react-dropzone';
 import { FaUpload } from 'react-icons/fa';
-import { useState } from "react";
+import axios from "axios";
+import { ToastContainer,toast } from "react-toastify";
+import { useEffect, useState } from "react";
+import { BASE_URL } from "./base_url";
 export default function BondDetail() {
     const [files, setFiles] = useState([]);
-
+const [bond,setBond]=useState()
+const [state,setState]=useState({
+    mission:'',
+    transaction:''
+})
     const onDrop = (acceptedFiles) => {
         const pdfFiles = acceptedFiles.filter(file => file.type === 'application/pdf');
         setFiles(prevFiles => [...prevFiles, ...pdfFiles]);
@@ -22,7 +29,32 @@ export default function BondDetail() {
         { bondID: 'BOND002', name: 'Bond Beta', description: 'Government bond for infrastructure', issuer: 'Beta Government', submissionDate: '2024-02-15', bondAmount: '$10,000,000', type: 'Inactive' },
         { bondID: 'BOND003', name: 'Bond Gamma', description: 'Municipal bond for urban development', issuer: 'Gamma Municipality', submissionDate: '2024-03-10', bondAmount: '$2,500,000', type: 'Active' },
     ];
+
+useEffect(()=>{
+getBondData();
+
+},[])
+
+const getBondData=async()=>{
+try{
+let response=await axios.get(`${BASE_URL}/get-bond/${bondid}`)
+setBond(response.data.bond)
+setState({
+    mission:response.data.mission
+})
+console.log(response.data)
+}catch(e){
+    if(e?.response?.data?.error){
+        toast.error(e?.response?.data?.error,{containerId:"bonddetail"})
+    }else{
+        toast.error("Client error please try again")
+    }
+}
+}
+
     return (
+        <>
+        <ToastContainer containerId={"bonddetail"}/>
         <div className="h-[100vh]">
             <div className="w-full min-h-[500px]  overflow-x-auto bg-white rounded-[20px] mt-[20px] px-[20px] py-[40px]">
                 {/* first section */}
@@ -31,52 +63,46 @@ export default function BondDetail() {
                     <div className="grid xl:grid-cols-4 grid-cols-2 gap-[20px]">
                         <div className="flex flex-col gap-[10px]">
                             <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond ID</h1>
-                            <p className="text-[16px] font-semibold">{bondid}</p>
+                            <p className="text-[16px] font-semibold">{bondid?.slice(0,20)}...</p>
                         </div>
                         <div className="flex flex-col gap-[10px]">
                             <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond Name</h1>
-                            <p className="text-[16px] font-semibold">abcd</p>
+                            <p className="text-[16px] font-semibold">{bond?.title}</p>
                         </div>
                         <div className="flex flex-col gap-[10px]">
                             <h1 className="text-[18px] font-semibold text-[#7E8183]">Issuer</h1>
-                            <p className="text-[16px] font-semibold">Aquaco</p>
+                            <p className="text-[16px] font-semibold">{bond?.issuer_id?.user_id?.username}</p>
                         </div>
                         <div className="flex flex-col gap-[10px]">
                             <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond Amount</h1>
-                            <p className="text-[16px] font-semibold">$55,000</p>
+                            <p className="text-[16px] font-semibold">${bond?.total_bonds*bond?.bond_price}</p>
                         </div>
                         <div className="flex flex-col gap-[10px]">
                             <h1 className="text-[18px] font-semibold text-[#7E8183]">Mission Details</h1>
-                            <p className="text-[16px] font-semibold">Clean Water Initiative</p>
+                            <p className="text-[16px] font-semibold">{state?.mission?.task_type}</p>
                         </div>
-                        <div className="flex flex-col gap-[10px]">
-                            <h1 className="text-[18px] font-semibold text-[#7E8183]">Approval Date</h1>
-                            <p className="text-[16px] font-semibold">20-11-2024</p>
-                        </div>
+                     
                         <div className="flex flex-col gap-[10px]">
                             <h1 className="text-[18px] font-semibold text-[#7E8183]">Validity Period</h1>
-                            <p className="text-[16px] font-semibold">6 months</p>
+                            <p className="text-[16px] font-semibold">{bond?.validity_number} months</p>
                         </div>
                         <div className="flex flex-col gap-[10px]">
                             <h1 className="text-[18px] font-semibold text-[#7E8183]">Status</h1>
-                            <p className="text-[16px] font-semibold">Active</p>
+                            <p className="text-[16px] font-semibold">{bond?.status}</p>
                         </div>
-                        <div className="flex flex-col gap-[10px]">
-                            <h1 className="text-[18px] font-semibold text-[#7E8183]">Activity Log</h1>
-                            <p className="text-[16px] font-semibold">-Approved on 28-12-2024</p>
-                        </div>
+                      
 
                     </div>
 
                 </div>
                 <div className="w-full h-[1px] bg-[#EAECF0] my-[20px]"></div>
                 {/* second section */}
-                <div className="flex flex-col gap-[20px]">
+                {/* <div className="flex flex-col gap-[20px]">
                     <h2 className="text-[24px] font-semibold">Associated Documents</h2>
                     <div
                         {...getRootProps()}
                         className="flex justify-between items-center w-full p-4 border-[#EAECF0] border rounded-lg cursor-pointer"
-                    >
+                        >
                         <input {...getInputProps()} />
                         <span className="text-left text-lg">Drag & drop PDF files here, or click to select files</span>
                         <FaUpload className="text-2xl" />
@@ -85,15 +111,15 @@ export default function BondDetail() {
                     <div className="mt-4">
                         {files.map((file, index) => (
                             <div
-                                key={index}
-                                className="flex justify-between items-center w-full p-2 border-[#EAECF0] border rounded-lg mb-2"
+                            key={index}
+                            className="flex justify-between items-center w-full p-2 border-[#EAECF0] border rounded-lg mb-2"
                             >
                                 <span className="text-lg">{file.name}</span>
                                 <FaUpload className="text-2xl" />
                             </div>
                         ))}
                     </div>
-                </div>
+                </div> */}
                 {/* table */}
                 <div>
                     <table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
@@ -123,5 +149,6 @@ export default function BondDetail() {
                 </div>
             </div>
         </div>
+                            </> 
     )
 }

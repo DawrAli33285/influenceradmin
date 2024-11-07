@@ -84,6 +84,29 @@ const UserTable = () => {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
+
+const deleteUser=async(id)=>{
+try{
+let response=await axios.delete(`${BASE_URL}/deleteUser/${id}`)
+toast.success(response?.data?.message,{containerId:"usermanagement"})
+setUsers((prev)=>{
+    let old=[...prev]
+    let newold=old.filter(u=>u?._id!=id)
+    return newold
+})
+setShowMenu(!showMenu)
+
+
+}catch(e){
+    if(e?.response?.data?.error){
+        toast.error(e?.response?.data?.error,{containerId:"usermanagement"})
+    }else{
+        toast.error("Client error please try again")
+    }
+}
+}
+
+
     return (
         <>
             <ToastContainer containerId="usermanagement" limit={1} />
@@ -110,16 +133,17 @@ const UserTable = () => {
                 </div>
                 {showFilters && (
                     <div className="absolute bg-white p-4 rounded-lg shadow-lg shadow-md space-y-4 right-[3rem] w-[250px] z-50">
-                        <div className='mt-4'>
+                        {/* <div className='mt-4'>
                             <label htmlFor="usertype" className="block text-md  font-semibold text-[#272226]">User Type</label>
                             <select
                                 value={filters.userType}
                                 onChange={(e) => setFilters({ ...filters, bondType: e.target.value })}
                                 className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
                             >
-                                <option value="">User Type</option>
+                                <option value="TEMPORARY">TEMPORARY</option>
+                                <option value="VERIFIED">VERIFIED</option>
                             </select>
-                        </div>
+                        </div> */}
                         <div className='mt-4'>
                             <label htmlFor="Status" className="block text-md  font-semibold text-[#272226]">Status</label>
                             <select
@@ -127,7 +151,8 @@ const UserTable = () => {
                                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
                                 className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
                             >
-                                <option value="">Status</option>
+                            <option value="TEMPORARY">TEMPORARY</option>
+                            <option value="VERIFIED">VERIFIED</option>
                             </select>
                         </div>
                         <div className='mt-4'>
@@ -161,7 +186,7 @@ const UserTable = () => {
                             </thead>
                             <tbody>
                                 {currentItems?.map((user, index) => (
-                                    <tr key={user._id} className="border-b">
+                                    <tr key={user?._id} className="border-b">
                                         <td className="p-[10px] border-l border-gray-300">{(index + 1)?.toString()}</td>
                                         <td className="p-[10px] border-l border-gray-300">{user?.username}</td>
                                         <td className="p-[10px] border-l border-gray-300">{user?.email}</td>
@@ -170,7 +195,7 @@ const UserTable = () => {
                                         <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(user?.current_active_state)}`}>
                                             {user?.current_active_state}
                                         </td>
-                                        <td className="p-[10px] border-l border-gray-300">{user?.createdAt && new Date(user.createdAt).toLocaleDateString('en-US', {
+                                        <td className="p-[10px] border-l border-gray-300">{user?.createdAt && new Date(user?.createdAt).toLocaleDateString('en-US', {
                                             month: "long",
                                             day: "numeric",
                                             year: "numeric"
@@ -184,7 +209,7 @@ const UserTable = () => {
                                                     <ul>
                                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">View</li>
                                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/userdetail/${user?.email}`}>Edit</Link></li>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
+                                                        <li onClick={()=>deleteUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
                                                     </ul>
                                                 </div>
                                             )}

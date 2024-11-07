@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MoonLoader } from 'react-spinners';
-import { ToastContainer } from 'react-toastify';
+import { ToastContainer,toast } from 'react-toastify';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { BASE_URL } from '../base_url';
 
 export default function BondTable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
     const [loading, setLoading] = useState(false);
     const [showMenu, setShowMenu] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
+    const [bonds,setBonds]=useState([])
     const [filters, setFilters] = useState({
         bondType: '',
         status: '',
@@ -68,9 +71,72 @@ export default function BondTable() {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
+useEffect(()=>{
+getBonds();
+},[])
+
+
+const getBonds=async()=>{
+    try{
+let response=await axios.get(`${BASE_URL}/get-bonds`)
+setBonds(response.data.bonds)
+console.log(response.data)
+    }catch(e){
+if(e?.response?.data?.error){
+    toast.error(e?.response?.data?.error,{containerId:"bondmanagement"})
+}else{
+    toast.error("Client error please try again",{containerId:"bondmanagement"})
+}
+    }
+}
+
+const deleteBond=async(id)=>{
+    try{
+let response=await axios.delete(`${BASE_URL}/deleteBond/${id}`)
+setBonds((prev)=>{
+    let old=[...prev]
+    let newold=old.filter(u=>u?._id!=id)
+    return newold
+})
+toast.success(response.data.message,{containerId:"bondmanagement"})
+setShowMenu(!showMenu)
+    }catch(e){
+if(e?.response?.data?.error){
+    toast.error(e?.response?.data?.error,{containerId:"bondmanagement"})
+}else{
+    toast.error("Client error please try again",{containerId:"bondmanagement"})
+}
+    }
+}
+
+const updateStatus=async(status,id)=>{
+    try{
+let response=await axios.patch(`${BASE_URL}/update-status/${status}/${id}`)
+setBonds((prev)=>{
+    let old=[...prev]
+    let getIndex=old.findIndex(u=>u?._id==id)
+    let newbond={
+        ...old[getIndex],
+        status
+    }
+    old[getIndex]=newbond
+    return old
+   
+})  
+toast.success(response?.data?.message,{containerId:"bondmanagement"})
+setShowMenu(!showMenu)
+}catch(e){
+if(e?.response?.data?.error){
+toast.error(e?.response?.data?.error,{containerId:"bondmanagement"})
+}else{
+toast.error("Client error please try again",{containerId:"bondmanagement"})
+}
+    }
+}
+
     return (
         <>
-            <ToastContainer containerId="usermanagement" limit={1} />
+            <ToastContainer containerId="bondmanagement" limit={1} />
             <div className="bg-white p-[20px] rounded-[20px] shadow-md">
                 <div className="flex justify-between items-center mb-[20px]">
                     <h1 className=" text-[24px] font-semibold">Sponsor Bond Managment</h1>
@@ -152,25 +218,25 @@ export default function BondTable() {
                                 <tr className="bg-[#FDFBFD]">
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Bond ID</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Name</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Description</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Unit Price</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Validity Number</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Issuer</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Submission Date</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Bond Amount</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
                                     <th className="p-[10px] text-left border-l border-r border-t border-gray-300">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentItems.map((user, index) => (
-                                    <tr key={user.id} className="border-b">
-                                        <td className="p-[10px] border-l border-gray-300">{user.bondID}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{user.name}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{user.description}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{user.issuer}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{user.submissionDate}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{user.bondAmount}</td>
-                                        <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(user.status)}`}>
-                                            {user.status}
+                                {bonds?.map((bond, index) => (
+                                    <tr key={bond.id} className="border-b">
+                                        <td className="p-[10px] border-l border-gray-300">{bond?._id}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.title}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_price}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.validity_number}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.issuer_id?.user_id?.username}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_price*bond?.total_bonds}</td>
+                                        <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(bond?.status)}`}>
+                                            {bond.status}
                                         </td>
                                         <td className="p-[10px] border-l border-r border-gray-300 relative">
                                             <button onClick={() => handleActionClick(index)} className="focus:outline-none">
@@ -179,10 +245,16 @@ export default function BondTable() {
                                             {showMenu === index && (
                                                 <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                     <ul>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to = {`/bond-detail/${user.bondID}`}>Edit</Link></li>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 text-red-500 cursor-pointer">Delete</li>
+                                                        <li onClick={()=>{
+                                                            updateStatus("APPROVED",bond?._id)
+                                                        }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
+                                                        <li  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to = {`/bond-detail/${bond?._id}`}>Edit</Link></li>
+                                                        <li onClick={()=>{
+                                                            updateStatus("REJECTED",bond?._id)
+                                                        }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
+                                                        <li className="px-4 py-2 hover:bg-gray-100 text-red-500 cursor-pointer" onClick={()=>{
+                                                            deleteBond(bond?._id)
+                                                        }}>Delete</li>
                                                     </ul>
                                                 </div>
                                             )}
