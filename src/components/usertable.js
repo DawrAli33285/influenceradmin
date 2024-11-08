@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 
 const UserTable = () => {
     const [selectedMonth, setSelectedMonth] = useState('default');
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [showMenu, setShowMenu] = useState(null);
     const [users, setUsers] = useState([])
     const [showFilters, setShowFilters] = useState(false);
@@ -51,6 +51,7 @@ const UserTable = () => {
         try {
             let response = await axios.get(`${BASE_URL}/get-users`)
             setUsers(response.data.user)
+            setLoading(false)
             console.log(response.data)
         } catch (e) {
             if (e?.response?.data?.error) {
@@ -60,12 +61,27 @@ const UserTable = () => {
             }
         }
     }
-    const filteredData = users.filter(
-        (item) =>
+    const filteredData = users.filter((item) => {
+        const matchesSearchQuery =
             item.username?.toLowerCase().includes(searchQuery.toLowerCase()) ||
             item.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.mobile_number?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+            item.mobile_number?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+        const matchesStatus = filters.status === '' || item.current_active_state === filters.status;
+    
+       
+        const itemRegistrationDate = new Date(item.createdAt).toISOString().split('T')[0]; // Extracts date portion as 'YYYY-MM-DD'
+        const selectedDate = filters.registrationDate;
+    
+        console.log('Item Registration Date:', itemRegistrationDate);
+        console.log('Selected Filter Date:', selectedDate);
+        
+        const matchesRegistrationDate = !selectedDate || itemRegistrationDate === selectedDate;
+    
+        return matchesSearchQuery && matchesStatus && matchesRegistrationDate;
+    });
+    
+    
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
@@ -109,6 +125,7 @@ setShowMenu(!showMenu)
 
     return (
         <>
+        
             <ToastContainer containerId="usermanagement" limit={1} />
             <div className="bg-white p-[20px] rounded-[20px] shadow-md">
                 <div className="flex justify-between items-center mb-[20px]">
@@ -158,6 +175,10 @@ setShowMenu(!showMenu)
                         <div className='mt-4'>
                             <label htmlFor="date" className="block text-md  font-semibold text-[#272226]">Registration Date</label>
                             <input
+                            onChange={(e) => {
+                                setFilters({ ...filters, registrationDate: e.target.value });
+                                console.log("Updated Filter Date:", e.target.value);  // Log the new date value
+                            }}
                                 type="date"
                                 placeholder="Registration Date"
                                 className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
