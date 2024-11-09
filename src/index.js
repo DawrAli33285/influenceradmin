@@ -12,6 +12,9 @@ import SellerAdminHeader from './components/header';
 import UserDetail from './userdetail';
 import BondManagment from './bondmanagment';
 import BondDetail from './bond-detail';
+import PaymentManagment from './paymentmanagment';
+import PaymentDetail from './paymentdetail';
+import CustomerSupport from './customersupport';
 const router = createBrowserRouter([
   {
     path: "/usermanagment",
@@ -29,7 +32,18 @@ const router = createBrowserRouter([
     path: "/bond-detail/:bondid",
     element: <SellerAdminHeader><BondDetail /></SellerAdminHeader>,
   },
-  
+  {
+    path: "/paymentmanagement",
+    element: <SellerAdminHeader><PaymentManagment /></SellerAdminHeader>,
+  },
+  {
+    path: "/payment-detail/:paymentid",
+    element: <SellerAdminHeader><PaymentDetail /></SellerAdminHeader>,
+  },
+  {
+    path: "/customersupport",
+    element: <SellerAdminHeader><CustomerSupport /></SellerAdminHeader>,
+  },
 ]);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
