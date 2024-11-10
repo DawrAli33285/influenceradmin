@@ -15,6 +15,11 @@ import BondDetail from './bond-detail';
 import PaymentManagment from './paymentmanagment';
 import PaymentDetail from './paymentdetail';
 import CustomerSupport from './customersupport';
+import EmailserviceOverview from './EmailserviceOverview';
+import Supportlink from './Supportlink';
+import Cloudflareverification from './Cloudflareverification';
+import Phoneverificationservice from './Phoneverificationservices';
+import Managecustomersupport from './Managecustomersupport';
 const router = createBrowserRouter([
   {
     path: "/usermanagment",
@@ -44,6 +49,29 @@ const router = createBrowserRouter([
     path: "/customersupport",
     element: <SellerAdminHeader><CustomerSupport /></SellerAdminHeader>,
   },
+  {
+    path: "/emailserviceoverview",
+    element: <SellerAdminHeader><EmailserviceOverview /></SellerAdminHeader>,
+  },
+  {
+    path: "/supportlink",
+    element: <SellerAdminHeader><Supportlink/></SellerAdminHeader>,
+  },
+  {
+    path: "/cloudflareVerificationServices",
+    element: <SellerAdminHeader><Cloudflareverification/></SellerAdminHeader>,
+  },
+ 
+  {
+    path: "/phoneverificationservice",
+    element: <SellerAdminHeader><Phoneverificationservice/></SellerAdminHeader>,
+  },
+   
+  {
+    path: "/Managecustomersupport",
+    element: <SellerAdminHeader><Managecustomersupport/></SellerAdminHeader>,
+  },
+ 
 ]);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

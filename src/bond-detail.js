@@ -23,7 +23,7 @@ export default function BondDetail() {
     })
     const [state, setState] = useState({
         mission: '',
-        transaction: '',
+        transaction: [],
         issuers:[]
     })
     const [loading,setLoading]=useState(true)
@@ -84,7 +84,8 @@ let navigate=useNavigate();
 
             setState({
                 mission: response.data.mission,
-                issuers:sortedIssuers
+                issuers:sortedIssuers,
+                transaction:response.data.transaction
             })
     setLoading(false)
             console.log(response.data)
@@ -113,7 +114,9 @@ setBond({
 })
 setState({
     ...state,
-    mission:response.data.mission
+    mission:response.data.mission,
+    
+
 })
 toast.success(response.data.message,{containerId:"bonddetail"})
 setIsEdit(!isedit)
@@ -125,6 +128,14 @@ setIsEdit(!isedit)
  }   
 }
 }
+
+
+useEffect(()=>{
+console.log("STATE")
+console.log(state)
+},[state])
+
+
 
     return (
         <>
@@ -312,7 +323,7 @@ setIsEdit(!isedit)
                 </div> */}
                     {/* table */}
                     <div>
-                      {state?.transaction?.length>0? <table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
+                      {state?.transaction?.length>0?<table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
                             <thead>
                                 <tr className="bg-[#FDFBFD]">
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Transaction ID</th>
@@ -325,18 +336,23 @@ setIsEdit(!isedit)
                                 </tr>
                             </thead>
                             <tbody>
-                                {state?.transaction.map((user, index) => (
-                                    <tr key={user.id} className="border-b">
-                                        <td className="p-[10px] border-l border-gray-300">{user.bondID}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{user.issuer}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{user.type}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{user.bondAmount}</td>
-                                        <td className="p-[10px] border-l border-gray-300 border-r">{user.submissionDate}</td>
+                                {state?.transaction?.map((transaction, index) => (
+                                    <tr key={transaction?._id} className="border-b">
+                                        <td className="p-[10px] border-l border-gray-300">{transaction?.bond_id?._id}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{transaction?.bond_id?.issuer_id?.user_id?.username}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{transaction?.status}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{transaction?.bond_id?.bond_issuerance_amount}</td>
+                                        <td className="p-[10px] border-l border-gray-300 border-r">{transaction?.createdAt ? new Date(transaction.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+}) : "N/A"}
+</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>:<div className="flex justify-center items-center w-full">
-<p>No Record Found</p>
+                             <p>No Record Found</p>
 
                             </div>
                             }

@@ -189,7 +189,7 @@ export default function CustomerSupportTable() {
                 <MoonLoader color="#6B33E3" size={100} />
             </div> : <div className="bg-white p-[20px] rounded-[20px] shadow-md">
                 <div className="flex justify-between items-center mb-[20px]">
-                    <h1 className=" text-[24px] font-semibold">Manage Customer Support</h1>
+                    <h1 className=" text-[24px] font-semibold">Support Requests</h1>
                     <div className='flex gap-[20px] items-center'>
                         <div>
                             <input
@@ -258,13 +258,11 @@ export default function CustomerSupportTable() {
                         {currentItems?.length > 0 ? <table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
                             <thead>
                                 <tr className="bg-[#FDFBFD]">
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Request ID</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">User Name</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Issue Type</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Request Date</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Admin Notes</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Service Name</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Description</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Additional info</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
-                                    <th className="p-[10px] text-left border-l border-r border-t border-gray-300">Action</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -274,22 +272,8 @@ export default function CustomerSupportTable() {
                                         <td className="p-[10px] border-l border-gray-300">{bond?.title}</td>
                                         <td className="p-[10px] border-l border-gray-300">{bond?.bond_price}</td>
                                         <td className="p-[10px] border-l border-gray-300">{bond?.validity_number}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.issuer_id?.user_id?.username}</td>
-                                        <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(bond?.status)}`}>
-                                            {bond.status}
-                                        </td>
-                                        <td className="p-[10px] border-l border-r border-gray-300 relative">
-                                            <button onClick={() => handleActionClick(index)} className="focus:outline-none">
-                                                <BsThreeDotsVertical />
-                                            </button>
-                                            {showMenu === index && (
-                                                <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
-                                                    <ul>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Resolve</li>
-
-                                                    </ul>
-                                                </div>
-                                            )}
+                                        <td className="p-[10px] border-l border-gray-300 px-[1rem] cursor-pointer">
+                                        <BsThreeDotsVertical />
                                         </td>
                                     </tr>
                                 ))}

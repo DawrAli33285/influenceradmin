@@ -11,6 +11,7 @@ import { BASE_URL } from '../base_url';
 export default function PaymentTable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
     const [loading, setLoading] = useState(true);
+    const [cancellationData,setCancellationData]=useState([])
     const [showMenu, setShowMenu] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
     const [bonds, setBonds] = useState([])
@@ -23,7 +24,7 @@ export default function PaymentTable() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-    const statusOptions = ['PENDING', 'REJECTED', 'APPROVED', 'COMPLETED', 'WAITING FOR EXCHANGE', 'IN PROGRESS'];
+    const statusOptions = ['PENDING', 'REJECTED', 'CANCELLED', 'APPROVED'];
     const amountRangeOptions = [
         'Under $1,000',
         '$1,000 - $5,000',
@@ -53,15 +54,23 @@ export default function PaymentTable() {
 
 
 
-    const filteredData = bonds?.filter((item) => {
-        const matchesSearch = item?.title?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-            item?._id?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-            item?.description?.toLowerCase()?.includes(searchQuery?.toLowerCase());
-
+    const filteredData = cancellationData?.filter((item) => {
+        
+        const lowerSearchQuery = searchQuery?.toLowerCase();
+    
+       
+        const matchesSearch = 
+            (item?.buyer_id?.user_id?.username?.toLowerCase()?.includes(lowerSearchQuery)) ||
+            (item?.bond_id?.issuer_id?.user_id?.username?.toLowerCase()?.includes(lowerSearchQuery)) ||
+            (item?.status?.toLowerCase()?.includes(lowerSearchQuery));
+    
+       
         const matchesStatus = filters.status ? item.status === filters.status : true;
-
-
+    
+        
         const matchesBondType = filters.bondType ? item.bondType === filters.bondType : true;
+    
+        
         const checkAmountRange = (range, amount) => {
             switch (range) {
                 case 'Under $1,000':
@@ -80,18 +89,19 @@ export default function PaymentTable() {
                     return true;
             }
         };
-
+    
+        
         const matchesAmountRange = filters.amountRange ? checkAmountRange(filters.amountRange, item.bond_price * item.total_bonds) : true;
-
+    
+       
         return matchesSearch && matchesStatus && matchesBondType && matchesAmountRange;
     });
-
-
+    
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-
+    
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageClick = (pageNumber) => {
@@ -106,67 +116,52 @@ export default function PaymentTable() {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
-    useEffect(() => {
-        getBonds();
-    }, [searchQuery])
-
-
-    const getBonds = async () => {
-        try {
-            let response = await axios.get(`${BASE_URL}/get-bonds`)
-            setLoading(false)
-            setBonds(response.data.bonds)
-
-            console.log(response.data)
-        } catch (e) {
-            if (e?.response?.data?.error) {
-                toast.error(e?.response?.data?.error, { containerId: "bondmanagement" })
-            } else {
-                toast.error("Client error please try again", { containerId: "bondmanagement" })
-            }
-        }
+const getCancellationData=async()=>{
+    try{
+let response=await axios.get(`${BASE_URL}/getCancellations`)
+console.log("RESPONSE")
+console.log(response.data)
+setCancellationData(response.data.cancellationRates)
+toast.success(response?.data?.message,{containerId:"paymenttable"})
+setLoading(false)
+    }catch(e){
+if(e?.response?.data?.error){
+toast.error(e?.response?.data?.error,{containerId:"paymenttable"})
+}else{
+toast.error("Client error please try again",{containerId:"paymenttable"})
+}
     }
+}
 
-    const deleteBond = async (id) => {
+
+   useEffect(()=>{
+    getCancellationData();
+   },[])
+
+    
+    
+
+    const updateStatus = async (id) => {
         try {
-            let response = await axios.delete(`${BASE_URL}/deleteBond/${id}`)
-            setBonds((prev) => {
-                let old = [...prev]
-                let newold = old.filter(u => u?._id != id)
-                return newold
-            })
-            toast.success(response.data.message, { containerId: "bondmanagement" })
+            let response = await axios.get(`${BASE_URL}/approveCancellationStatus/${id}`)
+           setCancellationData((prev)=>{
+            let old=[...prev]
+            let getIndex=old.findIndex(u=>u?._id==id)
+            let newitem={
+                ...old[getIndex],
+                status:"APPROVED"
+            }
+            old[getIndex]=newitem
+            return old
+           })
+            toast.success(response?.data?.message, { containerId: "paymenttable" })
             setShowMenu(!showMenu)
         } catch (e) {
+            alert(e.message)
             if (e?.response?.data?.error) {
-                toast.error(e?.response?.data?.error, { containerId: "bondmanagement" })
+                toast.error(e?.response?.data?.error, { containerId: "paymenttable" })
             } else {
-                toast.error("Client error please try again", { containerId: "bondmanagement" })
-            }
-        }
-    }
-
-    const updateStatus = async (status, id) => {
-        try {
-            let response = await axios.patch(`${BASE_URL}/update-status/${status}/${id}`)
-            setBonds((prev) => {
-                let old = [...prev]
-                let getIndex = old.findIndex(u => u?._id == id)
-                let newbond = {
-                    ...old[getIndex],
-                    status
-                }
-                old[getIndex] = newbond
-                return old
-
-            })
-            toast.success(response?.data?.message, { containerId: "bondmanagement" })
-            setShowMenu(!showMenu)
-        } catch (e) {
-            if (e?.response?.data?.error) {
-                toast.error(e?.response?.data?.error, { containerId: "bondmanagement" })
-            } else {
-                toast.error("Client error please try again", { containerId: "bondmanagement" })
+                toast.error("Client error please try again", { containerId: "paymenttable" })
             }
         }
     }
@@ -183,7 +178,7 @@ export default function PaymentTable() {
 
     return (
         <>
-            <ToastContainer containerId="bondmanagement" limit={1} />
+            <ToastContainer containerId="paymenttable" limit={1} />
 
             {loading == true ? <div className="flex justify-center items-center">
                 <MoonLoader color="#6B33E3" size={100} />
@@ -228,22 +223,7 @@ export default function PaymentTable() {
                             </select>
                         </div>
 
-                        <div className='mt-4'>
-                            <label htmlFor="range" className="block text-md  font-semibold text-[#272226]">Amount Range</label>
-
-                            <select
-                                value={filters.amountRange}
-                                onChange={(e) => setFilters({ ...filters, amountRange: e.target.value })}
-                                className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                            >
-                                <option value="">All</option>
-                                {amountRangeOptions.map((range) => (
-                                    <option key={range} value={range}>
-                                        {range}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                     
                     </div>
                 )}
 
@@ -259,7 +239,7 @@ export default function PaymentTable() {
                             <thead>
                                 <tr className="bg-[#FDFBFD]">
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Bond ID</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Name</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Buyer</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Issuer</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Cancellation Amount</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Cancellation Reason</th>
@@ -270,14 +250,15 @@ export default function PaymentTable() {
                             <tbody>
                                 {currentItems?.map((bond, index) => (
                                     <tr key={bond.id} className="border-b">
-                                        <td className="p-[10px] border-l border-gray-300">{bond?._id}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.title}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_price}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?._id}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.buyer_id?.user_id?.username}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.issuer_id?.user_id?.username}</td>
                                       
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.issuer_id?.user_id?.username}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_price * bond?.total_bonds}</td>
-                                        <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(bond?.status)}`}>
-                                            {bond.status}
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.bond_issuerance_amount}</td>
+                                        
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.reason}</td>
+                                        <td className={`p-[10px] border-l border-gray-300 ${bond?.status?bond?.status:`PENDING`}`}>
+                                            {bond?.status?bond?.status:`PENDING`}
                                         </td>
                                         <td className="p-[10px] border-l border-r border-gray-300 relative">
                                             <button onClick={() => handleActionClick(index)} className="focus:outline-none">
@@ -286,13 +267,10 @@ export default function PaymentTable() {
                                             {showMenu === index && (
                                                 <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                     <ul>
-                                                        <li onClick={() => {
-                                                            updateStatus("APPROVED", bond?._id)
-                                                        }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
-                                                      
+                                                        
                                                         <li onClick={() => {
                                                             
-                                                        }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/payment-detail/${bond?._id}`}>Suspend</Link></li>
+                                                        }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/payment-detail/${bond?._id}`}>View</Link></li>
                                                     </ul>
                                                 </div>
                                             )}

@@ -17,9 +17,19 @@ export default function PaymentDetail() {
     }
     const [rejectionReason, setRejectionReason] = useState('');
     const [note, setNote] = useState('');
-
-    const handleSendMessage = () => {
-        
+    const [cancellationData,setCancellationData]=useState([])
+    const rejectBond = async() => {
+        try{
+let response=await axios.get(`${BASE_URL}/cancelBond/${paymentid}`)
+toast.success(response?.data?.message)  
+navigate(-1)
+        }catch(e){
+            if(e?.response?.data?.error){
+                toast.error(e?.response?.data?.error,{containerId:"paymentdetail"})
+            }else{
+                toast.error("Client error please try again",{containerId:"paymentdetail"})
+            }
+        }
     };
     const [editData, setEditData] = useState({
         title: '',
@@ -33,10 +43,11 @@ export default function PaymentDetail() {
     })
     const [state, setState] = useState({
         mission: '',
-        transaction: '',
+        transaction: [],
+        cancellation:'',
         issuers: []
     })
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const onDrop = (acceptedFiles) => {
         const pdfFiles = acceptedFiles.filter(file => file.type === 'application/pdf');
         setFiles(prevFiles => [...prevFiles, ...pdfFiles]);
@@ -49,6 +60,7 @@ export default function PaymentDetail() {
     });
     const params = useParams();
     const { bondid } = params
+    const {paymentid}=params;
     const dummyData = {
         bondid: "BND12345678901234567890", // Bond ID, sliced to show only first 20 characters
         bond: {
@@ -90,7 +102,7 @@ export default function PaymentDetail() {
                 }
             ],
             mission: {
-                task_type: "2024-11-01" // Task type, in this case, a date
+                task_type: "2024-11-01" 
             }
         }
     };
@@ -108,47 +120,60 @@ export default function PaymentDetail() {
         setIsEdit(true)
     }
 
-    const editnow = async () => {
-        try {
-            let response = await axios.patch(`${BASE_URL}/update-bond/${bond?._id}`, editData)
-            let issuer = state.issuers.find(u => u?._id == response.data.bond.issuer_id)
-            console.log("ISSUER")
-            console.log(issuer)
-            setBond({
-                ...response.data.bond,
-                issuer_id: issuer
-
-            })
-            setState({
-                ...state,
-                mission: response.data.mission
-            })
-            toast.success(response.data.message, { containerId: "bonddetail" })
-            setIsEdit(!isedit)
-        } catch (e) {
-            if (e?.response?.data?.error) {
-                toast.error(e?.response?.data?.error, { containerId: "bonddetail" })
-            } else {
-                toast.error("Client error please try again")
-            }
-        }
+  const getSingleCancellation=async()=>{
+    try{
+let response=await axios.get(`${BASE_URL}/getSingleCancellation/${paymentid}`)
+   console.log("GET SINGLE CANCELLATION")
+   setState({
+    cancellation:response.data.cancellation,
+    transaction:response.data.transactions
+   })
+   setLoading(!loading)
+console.log(response.data)
+}catch(e){
+if(e?.response?.data?.error){
+    toast.error(e?.response?.data?.error,{containerId:"paymentdetail"})
+}else{
+    toast.error("Client error please try again",{containerId:"paymentdetail"})
+}
     }
+  }
+
+
+useEffect(()=>{
+getSingleCancellation();
+},[])
+
+const rejectCancellation=async()=>{
+try{
+let response=await axios.get(`${BASE_URL}/rejectCancellation/${paymentid}`)
+toast.success(response.data.message,{containerId:"paymentdetail"})
+navigate('/paymentmanagement')
+}catch(e){
+    if(e?.response?.data?.error){
+        toast.error(e?.response?.data?.error,{containerId:"paymentdetail"})
+    }else{
+        toast.error("Client error please try again",{containerId:"paymentdetail"})
+    }
+}
+}
+
 
     return (
         <>
-            <ToastContainer containerId={"bonddetail"} />
+            <ToastContainer containerId={"paymentdetail"} />
             <div className="h-[100vh]">
                 <div className="w-full min-h-[500px]  overflow-x-auto bg-white rounded-[20px] mt-[20px] px-[20px] py-[40px]">
                     {loading ? <div className="flex justify-center items-center">
                         <MoonLoader color="#6B33E3" size={100} />
                     </div> : <>
-                        {/* first section */}
+                        
                         <div className="flex flex-col gap-[20px] w-full xl:px-[40px]">
                             <h2 className="text-[24px] font-semibold">Bond information</h2>
                             <div className="grid xl:grid-cols-4 grid-cols-2 gap-[20px]">
                                 <div className="flex flex-col gap-[10px]">
                                     <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond ID</h1>
-                                    <p className="text-[16px] font-semibold">{bondid?.slice(0, 20)}...</p>
+                                    <p className="text-[16px] font-semibold">{state?.cancellation?._id?.slice(0, 20)}...</p>
                                 </div>
                                 <div className="flex flex-col gap-[10px]">
                                     <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond Name</h1>
@@ -163,7 +188,7 @@ export default function PaymentDetail() {
                                                 })
                                             }}
                                             className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                                        /> : <p className="text-[16px] font-semibold">{bond?.title}</p>
+                                        /> : <p className="text-[16px] font-semibold">{state?.cancellation?.bond_id?.title}</p>
                                     }
 
                                 </div>
@@ -194,7 +219,7 @@ export default function PaymentDetail() {
                                                 ))}
                                         </select>
                                             :
-                                            <p className="text-[16px] font-semibold">{bond?.issuer_id?.user_id?.username}</p>
+                                            <p className="text-[16px] font-semibold">{state?.cancellation?.bond_id?.issuer_id?.user_id?.username}</p>
 
                                     }
                                 </div>
@@ -212,7 +237,7 @@ export default function PaymentDetail() {
                                             type="number"
                                             className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
                                         /> :
-                                            <p className="text-[16px] font-semibold">${bond?.total_bonds * bond?.bond_price}</p>
+                                            <p className="text-[16px] font-semibold">{state?.cancellation?.bond_id?.status}</p>
                                     }
                                 </div>
                                 <div className="flex flex-col gap-[10px]">
@@ -229,7 +254,14 @@ export default function PaymentDetail() {
                                             }}
                                             className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
                                         /> :
-                                            <p className="text-[16px] font-semibold">{state?.mission?.task_type}</p>
+<p className="text-[16px] font-semibold">
+  {new Date(state?.cancellation?.bond_id?.createdAt).toLocaleDateString('en-us',{
+    month:'long',
+    day:'numeric',
+    year:'numeric'
+  })}
+</p>
+
                                     }
                                 </div>
                                 <div className="flex flex-col gap-[10px]">
@@ -259,7 +291,7 @@ export default function PaymentDetail() {
                                                 ))}
                                         </select>
                                             :
-                                            <p className="text-[16px] font-semibold">{bond?.issuer_id?.user_id?.username}</p>
+                                            <p className="text-[16px] font-semibold">{state?.cancellation?.bond_id?.bond_issuerance_amount}</p>
 
                                     }
                                 </div>
@@ -270,13 +302,13 @@ export default function PaymentDetail() {
 
                         </div>
                         <div className="w-full h-[1px] bg-[#EAECF0] my-[20px]"></div>
-                        {/* second section */}
+                      
                         <div className="flex flex-col gap-[20px] w-full xl:px-[40px]">
                             <h2 className="text-[24px] font-semibold">Cancelation request details</h2>
                             <div className="grid xl:grid-cols-4 grid-cols-2 gap-[20px]">
                                 <div className="flex flex-col gap-[10px]">
                                     <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond ID</h1>
-                                    <p className="text-[16px] font-semibold">{bondid?.slice(0, 20)}...</p>
+                                    <p className="text-[16px] font-semibold">{state?.cancellation?._id?.slice(0, 20)}...</p>
                                 </div>
                                 <div className="flex flex-col gap-[10px]">
                                     <h1 className="text-[18px] font-semibold text-[#7E8183]">Request ID</h1>
@@ -291,7 +323,7 @@ export default function PaymentDetail() {
                                                 })
                                             }}
                                             className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                                        /> : <p className="text-[16px] font-semibold">{bond?.title}</p>
+                                        /> : <p className="text-[16px] font-semibold">{state?.cancellation?.buyer_id?.slice(0,20)}...</p>
                                     }
 
                                 </div>
@@ -322,7 +354,7 @@ export default function PaymentDetail() {
                                                 ))}
                                         </select>
                                             :
-                                            <p className="text-[16px] font-semibold">{bond?.issuer_id?.user_id?.username}</p>
+                                            <p className="text-[16px] font-semibold">{new Date(state?.cancellation?.createdAt).toLocaleDateString()}</p>
 
                                     }
                                 </div>
@@ -340,7 +372,7 @@ export default function PaymentDetail() {
                                             type="number"
                                             className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
                                         /> :
-                                            <p className="text-[16px] font-semibold">${bond?.total_bonds * bond?.bond_price}</p>
+                                            <p className="text-[16px] font-semibold">${state?.cancellation?.bond_id?.bond_issuerance_amount}</p>
                                     }
                                 </div>
                                 <div className="flex flex-col gap-[10px]">
@@ -357,7 +389,11 @@ export default function PaymentDetail() {
                                             }}
                                             className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
                                         /> :
-                                            <p className="text-[16px] font-semibold">{state?.mission?.task_type}</p>
+                                            <p className="text-[16px] font-semibold">{new Date(state?.cancellation?.bond_id?.createdAt).toLocaleDateString('en-us',{
+                                                month:'long',
+                                                day:'numeric',
+                                                year:'numeric'
+                                            })}</p>
                                     }
                                 </div>
                                 <div className="flex flex-col gap-[10px]">
@@ -387,7 +423,7 @@ export default function PaymentDetail() {
                                                 ))}
                                         </select>
                                             :
-                                            <p className="text-[16px] font-semibold">{bond?.issuer_id?.user_id?.username}</p>
+                                            <p className="text-[16px] font-semibold">{state?.cancellation?.status}</p>
 
                                     }
                                 </div>
@@ -418,7 +454,7 @@ export default function PaymentDetail() {
                                                 ))}
                                         </select>
                                             :
-                                            <p className="text-[16px] font-semibold">{bond?.issuer_id?.user_id?.username}</p>
+                                            <p className="text-[16px] font-semibold">{state?.cancellation?.reason}</p>
 
                                     }
                                 </div>
@@ -450,7 +486,7 @@ export default function PaymentDetail() {
                                                 ))}
                                         </select>
                                             :
-                                            <p className="text-[16px] font-semibold">{bond?.issuer_id?.user_id?.username}</p>
+                                            <p className="text-[16px] font-semibold">{state?.cancellation?.description}</p>
 
                                     }
                                 </div>
@@ -462,7 +498,7 @@ export default function PaymentDetail() {
                             <div className="grid xl:grid-cols-4 grid-cols-2 gap-[20px]">
                                 <div className="flex flex-col gap-[10px]">
                                     <h1 className="text-[18px] font-semibold text-[#7E8183]">Issuer name</h1>
-                                    <p className="text-[16px] font-semibold">{bondid?.slice(0, 20)}...</p>
+                                    <p className="text-[16px] font-semibold">{state?.cancellation?.bond_id?.issuer_id?.user_id?.username}</p>
                                 </div>
                                 <div className="flex flex-col gap-[10px]">
                                     <h1 className="text-[18px] font-semibold text-[#7E8183]">Email</h1>
@@ -477,7 +513,7 @@ export default function PaymentDetail() {
                                                 })
                                             }}
                                             className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                                        /> : <p className="text-[16px] font-semibold">{bond?.title}</p>
+                                        /> : <p className="text-[16px] font-semibold">{state?.cancellation?.bond_id?.issuer_id?.user_id?.email}</p>
                                     }
 
                                 </div>
@@ -508,9 +544,7 @@ export default function PaymentDetail() {
                                                 ))}
                                         </select>
                                             :
-                                            <p className="text-[16px] font-semibold">{bond?.issuer_id?.user_id?.username}</p>
-
-                                    }
+                                            <p className="text-[16px] font-semibold">{state?.cancellation?.bond_id?.issuer_id?.user_id?.country_code_id?.country_code+state?.cancellation?.bond_id?.issuer_id?.user_id?.mobile_number}</p>}
                                 </div>
                             </div>
 
@@ -553,13 +587,17 @@ export default function PaymentDetail() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dummyDatatbl.map((user, index) => (
+                                    {state?.transaction?.map((user, index) => (
                                         <tr key={user.id} className="border-b">
-                                            <td className="p-[10px] border-l border-gray-300">{user.bondID}</td>
-                                            <td className="p-[10px] border-l border-gray-300">{user.issuer}</td>
-                                            <td className="p-[10px] border-l border-gray-300">{user.type}</td>
-                                            <td className="p-[10px] border-l border-gray-300">{user.bondAmount}</td>
-                                            <td className="p-[10px] border-l border-gray-300 border-r">{user.submissionDate}</td>
+                                            <td className="p-[10px] border-l border-gray-300">{user?._id}</td>
+                                            <td className="p-[10px] border-l border-gray-300">{new Date(user?.createdAt).toLocaleDateString('en-us',{
+                                                month:'long',
+                                                day:'numeric',
+                                                year:'numeric'
+                                            })}</td>
+                                            <td className="p-[10px] border-l border-gray-300">{user?.payment_method_id?.method_name}</td>
+                                            <td className="p-[10px] border-l border-gray-300">${user?.bond_id?.bond_issuerance_amount}</td>
+                                            <td className="p-[10px] border-l border-gray-300 border-r">{user?.status}</td>
                                         </tr>
                                     ))}
                                 </tbody>
@@ -569,58 +607,14 @@ export default function PaymentDetail() {
                             </div>
                             }
                             <div className='flex justify-end w-full gap-[20px] mt-[40px]'>
-                                <button className='border rounded-[20px] px-[20px] py-[10px] text-red-500 border-red-500' onClick={edituser}>Reject Cancellation</button>
-                                <button className='border rounded-[20px] px-[20px] py-[10px] text-[#6b33e3] border-[#6b33e3]' onClick={rejectionpopup}>Approve Canellation</button>
+                                <button className='border rounded-[20px] px-[20px] py-[10px] text-red-500 border-red-500' onClick={rejectCancellation}>Reject Cancellation</button>
+                                <button className='border rounded-[20px] px-[20px] py-[10px] text-[#6b33e3] border-[#6b33e3]' onClick={rejectBond}>Approve Canellation</button>
 
                             </div>
                         </div>
                     </>}
                 </div>
-                {
-                    rejectpopup && <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" onClick={rejectionpopup}>
-                        <div className="bg-white rounded-lg p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-                            <h2 className="text-[24px] font-semibold mb-4">Rejection Reason</h2>
-
-                            <div className="mb-4">
-                                <label className="text-[18px] font-semibold text-black" htmlFor="rejectionReason">
-                                    Select Reason
-                                </label>
-                                <select
-                                    id="rejectionReason"
-                                    value={rejectionReason}
-                                    onChange={(e) => setRejectionReason(e.target.value)}
-                                    className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                                >
-                                    <option value="" disabled>Select a reason</option>
-                                    <option value="Incomplete Information">Incomplete Information</option>
-                                    <option value="Invalid Data">Invalid Data</option>
-                                    <option value="Policy Violation">Policy Violation</option>
-                                </select>
-                            </div>
-
-                            <div className="mb-4">
-                                <label className="text-[18px] font-semibold text-black" htmlFor="note">
-                                    Add Note
-                                </label>
-                                <textarea
-                                    id="note"
-                                    value={note}
-                                    onChange={(e) => setNote(e.target.value)}
-                                    rows="4"
-                                    className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                                    placeholder="Add additional details here"
-                                />
-                            </div>
-
-                            <button
-                                onClick={handleSendMessage}
-                                className="w-full py-3 mt-4 bg-blue-500 text-white rounded-[20px] font-semibold hover:bg-[#6b33e3]"
-                            >
-                                Send Message
-                            </button>
-                        </div>
-                    </div>
-                }
+             
             </div>
         </>
     )
