@@ -20,6 +20,7 @@ import Supportlink from './Supportlink';
 import Cloudflareverification from './Cloudflareverification';
 import Phoneverificationservice from './Phoneverificationservices';
 import Managecustomersupport from './Managecustomersupport';
+import Dashboard from './dashboard';
 const router = createBrowserRouter([
   {
     path: "/usermanagment",
@@ -71,7 +72,10 @@ const router = createBrowserRouter([
     path: "/Managecustomersupport",
     element: <SellerAdminHeader><Managecustomersupport/></SellerAdminHeader>,
   },
- 
+  {
+    path: "/dashboard",
+    element: <SellerAdminHeader><Dashboard/></SellerAdminHeader>,
+  },
 ]);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

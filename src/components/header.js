@@ -35,6 +35,16 @@ export default function SellerAdminHeader({ children }) {
                     <div className="flex flex-col gap-[10px]">
                         <h1 className="text-white text-[24px] font-semibold mb-[20px]">LOGOIPSUM</h1>
                         <Link
+                            to="/dashboard"
+                            className={`flex gap-[10px] rounded-[20px] items-center py-[10px] px-[20px] text-[18px] ${location.pathname === '/dashboard' ? 'bg-white text-[#2563EB]' : 'text-white'}`}
+                        >
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M6 13V15M10 9V15M14 5V15M5.8 19H14.2C15.8802 19 16.7202 19 17.362 18.673C17.9265 18.3854 18.3854 17.9265 18.673 17.362C19 16.7202 19 15.8802 19 14.2V5.8C19 4.11984 19 3.27976 18.673 2.63803C18.3854 2.07354 17.9265 1.6146 17.362 1.32698C16.7202 1 15.8802 1 14.2 1H5.8C4.11984 1 3.27976 1 2.63803 1.32698C2.07354 1.6146 1.6146 2.07354 1.32698 2.63803C1 3.27976 1 4.11984 1 5.8V14.2C1 15.8802 1 16.7202 1.32698 17.362C1.6146 17.9265 2.07354 18.3854 2.63803 18.673C3.27976 19 4.11984 19 5.8 19Z" stroke={`${location.pathname === '/dashboard' ? '#2563EB' : 'white'}`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+
+                            Dashboard
+                        </Link>
+                        <Link
                             to="/usermanagment"
                             className={`flex gap-[10px] rounded-[20px] items-center py-[10px] px-[20px] text-[18px] ${location.pathname === '/usermanagment' ? 'bg-white text-[#2563EB]' : 'text-white'}`}
                         >
@@ -124,6 +134,7 @@ export default function SellerAdminHeader({ children }) {
 
                             Manage Customer Support
                         </Link>
+
                     </div>
                     <div className="flex flex-col gap-[10px]">
                         <Link
@@ -191,6 +202,16 @@ export default function SellerAdminHeader({ children }) {
                                 <div className="absolute top-[4%] right-[5%]" onClick={() => setMenuPopup(!menupopup)}>
                                     <svg width="30px" height="30px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" fill="white"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill="white" d="M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z"></path></g></svg>
                                 </div>
+                                <Link
+                                    to="/dashboard"
+                                    className={`flex gap-[10px] rounded-[20px] items-center py-[10px] px-[20px] text-[18px] ${location.pathname === '/dashboard' ? 'bg-white text-[#2563EB]' : 'text-white'}`}
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M6 13V15M10 9V15M14 5V15M5.8 19H14.2C15.8802 19 16.7202 19 17.362 18.673C17.9265 18.3854 18.3854 17.9265 18.673 17.362C19 16.7202 19 15.8802 19 14.2V5.8C19 4.11984 19 3.27976 18.673 2.63803C18.3854 2.07354 17.9265 1.6146 17.362 1.32698C16.7202 1 15.8802 1 14.2 1H5.8C4.11984 1 3.27976 1 2.63803 1.32698C2.07354 1.6146 1.6146 2.07354 1.32698 2.63803C1 3.27976 1 4.11984 1 5.8V14.2C1 15.8802 1 16.7202 1.32698 17.362C1.6146 17.9265 2.07354 18.3854 2.63803 18.673C3.27976 19 4.11984 19 5.8 19Z" stroke={`${location.pathname === '/dashboard' ? '#2563EB' : 'white'}`} stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+
+                                    Dashboard
+                                </Link>
                                 <Link
                                     to="/usermanagment"
                                     className={`flex gap-[10px] rounded-[20px] items-center py-[10px] px-[20px] text-[18px] ${location.pathname === '/usermanagment' ? 'bg-white text-[#2563EB]' : 'text-white'}`}
