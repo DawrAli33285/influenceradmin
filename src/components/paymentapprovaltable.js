@@ -8,10 +8,11 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { BASE_URL } from '../base_url';
 
-export default function PaymentTable() {
+export default function Paymentapprovaltable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
     const [loading, setLoading] = useState(true);
     const [cancellationData,setCancellationData]=useState([])
+    const [transactionData,setTransactionData]=useState([])
     const [showMenu, setShowMenu] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
     const [bonds, setBonds] = useState([])
@@ -24,7 +25,7 @@ export default function PaymentTable() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-    const statusOptions = ['PENDING', 'REJECTED', 'CANCELLED', 'APPROVED'];
+    const statusOptions = ['SUCESS','FAILED','REJECTED'];
     const amountRangeOptions = [
         'Under $1,000',
         '$1,000 - $5,000',
@@ -54,22 +55,16 @@ export default function PaymentTable() {
 
 
 
-    const filteredData = cancellationData?.filter((item) => {
-        
+    const filteredData = transactionData?.filter((item) => {
         const lowerSearchQuery = searchQuery?.toLowerCase();
     
        
         const matchesSearch = 
-            (item?.buyer_id?.user_id?.username?.toLowerCase()?.includes(lowerSearchQuery)) ||
-            (item?.bond_id?.issuer_id?.user_id?.username?.toLowerCase()?.includes(lowerSearchQuery)) ||
+            (item?.payment_method_id?.method_name?.toLowerCase()?.includes(lowerSearchQuery)) || 
             (item?.status?.toLowerCase()?.includes(lowerSearchQuery));
-    
-       
-        const matchesStatus = filters.status ? item.status === filters.status : true;
-    
         
+        const matchesStatus = filters.status ? item.status === filters.status : true;
         const matchesBondType = filters.bondType ? item.bondType === filters.bondType : true;
-    
         
         const checkAmountRange = (range, amount) => {
             switch (range) {
@@ -90,19 +85,17 @@ export default function PaymentTable() {
             }
         };
     
-        
         const matchesAmountRange = filters.amountRange ? checkAmountRange(filters.amountRange, item.bond_price * item.total_bonds) : true;
     
-       
         return matchesSearch && matchesStatus && matchesBondType && matchesAmountRange;
     });
     
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredData?.slice(indexOfFirstItem, indexOfLastItem);
     
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
 
     const handlePageClick = (pageNumber) => {
         setCurrentPage(pageNumber);
@@ -116,55 +109,30 @@ export default function PaymentTable() {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
-const getCancellationData=async()=>{
+const getTransactionData=async()=>{
     try{
-let response=await axios.get(`${BASE_URL}/getCancellations`)
+let response=await axios.get(`${BASE_URL}/get-payments`)
 console.log("RESPONSE")
 console.log(response.data)
-setCancellationData(response.data.cancellationRates)
-toast.success(response?.data?.message,{containerId:"paymenttable"})
+setTransactionData(response.data.transactions)
+toast.success(response?.data?.message,{containerId:"paymentapproval"})
 setLoading(false)
     }catch(e){
 if(e?.response?.data?.error){
-toast.error(e?.response?.data?.error,{containerId:"paymenttable"})
+toast.error(e?.response?.data?.error,{containerId:"paymentapproval"})
 }else{
-toast.error("Client error please try again",{containerId:"paymenttable"})
+toast.error("Client error please try again",{containerId:"paymentapproval"})
 }
     }
 }
 
 
    useEffect(()=>{
-    getCancellationData();
+   getTransactionData();
    },[])
 
     
     
-
-    const updateStatus = async (id) => {
-        try {
-            let response = await axios.get(`${BASE_URL}/approveCancellationStatus/${id}`)
-           setCancellationData((prev)=>{
-            let old=[...prev]
-            let getIndex=old.findIndex(u=>u?._id==id)
-            let newitem={
-                ...old[getIndex],
-                status:"APPROVED"
-            }
-            old[getIndex]=newitem
-            return old
-           })
-            toast.success(response?.data?.message, { containerId: "paymenttable" })
-            setShowMenu(!showMenu)
-        } catch (e) {
-            alert(e.message)
-            if (e?.response?.data?.error) {
-                toast.error(e?.response?.data?.error, { containerId: "paymenttable" })
-            } else {
-                toast.error("Client error please try again", { containerId: "paymenttable" })
-            }
-        }
-    }
 
 
 
@@ -176,9 +144,59 @@ toast.error("Client error please try again",{containerId:"paymenttable"})
 
 
 
+const suspendTransaction=async(id)=>{
+    try{
+let response=await axios.patch(`${BASE_URL}/suspendPayment/${id}`)
+setTransactionData((prev)=>{
+    let old=[...prev]
+    let findIndex=old.findIndex(u=>u._id==id)
+    old[findIndex]={
+        ...old[findIndex],
+        status:"REJECTED"
+    }
+    return old
+})
+setShowMenu(false)
+toast.success("Payment rejected sucessfully",{containerId:"paymentapproval"})
+    }catch(e){
+if(e?.response?.data?.error){
+    toast.error(e?.response?.data?.error,{containerId:"paymentapproval"})
+}else{
+    toast.error("Client error please try again",{containerId:"paymentapproval"})
+}
+    }
+}
+
+
+
+const approveTransaction=async(id)=>{
+    try{
+let response=await axios.patch(`${BASE_URL}/approvePayment/${id}`)
+setTransactionData((prev)=>{
+    let old=[...prev]
+    let findIndex=old.findIndex(u=>u._id==id)
+    old[findIndex]={
+        ...old[findIndex],
+        status:"SUCESS"
+    }
+    return old
+})
+setShowMenu(false)
+toast.success("Payment approved sucessfully",{containerId:"paymentapproval"})
+    }catch(e){
+if(e?.response?.data?.error){
+    toast.error(e?.response?.data?.error,{containerId:"paymentapproval"})
+}else{
+    toast.error("Client error please try again",{containerId:"paymentapproval"})
+}
+    }
+}
+
+
+
     return (
         <>
-            <ToastContainer containerId="paymenttable" limit={1} />
+            <ToastContainer containerId="paymentapproval" limit={1} />
 
             {loading == true ? <div className="flex justify-center items-center">
                 <MoonLoader color="#6B33E3" size={100} />
@@ -239,10 +257,9 @@ toast.error("Client error please try again",{containerId:"paymenttable"})
                             <thead>
                                 <tr className="bg-[#FDFBFD]">
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Bond ID</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Buyer</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Issuer</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Cancellation Amount</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Cancellation Reason</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Method Name</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">No Of Bonds</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Amount</th>
                                     <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
                                     <th className="p-[10px] text-left border-l border-r border-t border-gray-300">Action</th>
                                 </tr>
@@ -251,12 +268,13 @@ toast.error("Client error please try again",{containerId:"paymenttable"})
                                 {currentItems?.map((bond, index) => (
                                     <tr key={bond.id} className="border-b">
                                         <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?._id}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.buyer_id?.user_id?.username}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.issuer_id?.user_id?.username}</td>
-                                      
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.bond_issuerance_amount}</td>
-                                        
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.reason}</td>
+                                        <td className="p-[10px] border-l border-gray-300">{bond?.payment_method_id?.method_name}</td>
+                                        <td className={`p-[10px] border-l border-gray-300`}>
+                                           {bond?.no_of_bonds}
+                                        </td>
+                                        <td className={`p-[10px] border-l border-gray-300`}>
+                                            ${bond?.amount?.toString()}
+                                        </td> 
                                         <td className={`p-[10px] border-l border-gray-300 ${bond?.status?bond?.status:`PENDING`}`}>
                                             {bond?.status?bond?.status:`PENDING`}
                                         </td>
@@ -268,9 +286,8 @@ toast.error("Client error please try again",{containerId:"paymenttable"})
                                                 <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                     <ul>
                                                         
-                                                        <li onClick={() => {
-                                                            
-                                                        }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/payment-detail/${bond?._id}`}>View</Link></li>
+                                                        <li onClick={()=>suspendTransaction(bond?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reject</li>
+                                                        <li onClick={()=>approveTransaction(bond?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
                                                     </ul>
                                                 </div>
                                             )}

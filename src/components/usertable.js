@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { MoonLoader } from 'react-spinners';
 import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { BASE_URL } from '../base_url';
@@ -122,12 +123,12 @@ setShowMenu(!showMenu)
 }
 }
 
-
+const navigate=useNavigate();
     return (
         <>
         
             <ToastContainer containerId="usermanagement" limit={1} />
-            <div className="bg-white p-[20px] rounded-[20px] shadow-md">
+            <div className="bg-white max-h-[700px]  overflow-y-auto p-[20px] rounded-[20px] shadow-md">
                 <div className="flex justify-between items-center mb-[20px]">
                     <h1 className="text-[#2563EB] text-[24px] font-semibold">User Listing</h1>
                     <div className='flex gap-[20px] items-center'>
@@ -228,7 +229,9 @@ setShowMenu(!showMenu)
                                             {showMenu === index && (
                                                 <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                     <ul>
-                                                        <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">View</li>
+                                                        <li onClick={()=>{
+                                                            navigate(`/Sendemail?to=${user?.email}`)
+                                                        }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Send Email</li>
                                                         <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/userdetail/${user?.email}`}>Edit</Link></li>
                                                         <li onClick={()=>deleteUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
                                                     </ul>

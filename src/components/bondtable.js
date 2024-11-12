@@ -11,7 +11,15 @@ import { BASE_URL } from '../base_url';
 export default function BondTable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
     const [loading, setLoading] = useState(true);
+    const [cancelledpopup,setCancelledPopup]=useState(false)
     const [showMenu, setShowMenu] = useState(null);
+    const [cancellationState,setCancellationState]=useState({
+        reason:'Incomplete Information',
+        description:'',
+        bond_id:'',
+        email:'',
+        title:''
+       })
     const [showFilters, setShowFilters] = useState(false);
     const [bonds,setBonds]=useState([])
     const [filters, setFilters] = useState({
@@ -180,6 +188,33 @@ const filterSearch = (e) => {
 };
 
 
+const cancellbond=async()=>{
+    try{
+let response=await axios.post(`${BASE_URL}/rejectBond`,cancellationState)
+setCancellationState({
+    reason:'Incomplete Information',
+    description:'',
+    bond_id:''
+})
+setBonds((prev)=>{
+    let old=[...prev]
+    let findIndex=old.findIndex(u=>u._id==cancellationState.bond_id)
+    old[findIndex]={
+        ...old[findIndex],
+        status:"REJECTED"
+    }
+    return old
+})
+setCancelledPopup(false)
+toast.success(response.data.message,{containerId:"bondmanagement"})
+    }catch(e){
+if(e?.response?.data?.error){
+    toast.error(e?.response?.data?.error,{containerId:"bondmanagement"})
+}else{
+    toast.error("Client error please try again",{containerId:"bondmanagement"})
+}
+    }
+}
 
     return (
         <>
@@ -187,7 +222,7 @@ const filterSearch = (e) => {
             
             {loading==true?<div className="flex justify-center items-center">
                         <MoonLoader color="#6B33E3" size={100} />
-                    </div>:<div className="bg-white p-[20px] rounded-[20px] shadow-md">
+                    </div>:<div className="bg-white max-h-[700px]  overflow-y-auto p-[20px] rounded-[20px] shadow-md">
                 <div className="flex justify-between items-center mb-[20px]">
                     <h1 className=" text-[24px] font-semibold">Sponsor Bond Managment</h1>
                     <div className='flex gap-[20px] items-center'>
@@ -292,7 +327,15 @@ const filterSearch = (e) => {
                                                         }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
                                                         <li  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to = {`/bond-detail/${bond?._id}`}>Edit</Link></li>
                                                         <li onClick={()=>{
-                                                            updateStatus("REJECTED",bond?._id)
+                                                            setShowMenu(false)
+                                                            setCancelledPopup(true)
+                                                            setCancellationState({
+                                                                ...cancellationState,
+                                                                bond_id:bond?._id,
+                                                                email:bond?.issuer_id?.user_id?.email,
+                                                                title:bond?.title
+                                                            })
+                                                            // updateStatus("REJECTED",bond?._id)
                                                         }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
                                                         <li className="px-4 py-2 hover:bg-gray-100 text-red-500 cursor-pointer" onClick={()=>{
                                                             deleteBond(bond?._id)
@@ -336,6 +379,67 @@ const filterSearch = (e) => {
                     </>
                 )}
             </div>}
+
+
+
+
+
+            {cancelledpopup?<div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" onClick={(e)=>{
+    setCancelledPopup(!cancelledpopup)
+}}>
+                        <div className="bg-white rounded-lg p-6 w-full max-w-md" onClick={(e) => e.stopPropagation()}>
+                            <h2 className="text-[24px] font-semibold mb-4">Rejection Reason</h2>
+
+                            <div className="mb-4">
+                                <label className="text-[18px] font-semibold text-black" htmlFor="rejectionReason">
+                                    Select Reason
+                                </label>
+                                <select
+                                    id="rejectionReason"
+                                   value={cancellationState.reason}
+                                    onChange={(e)=>{
+                                        setCancellationState({
+                                            ...cancellationState,
+                                            reason:e.target.value
+                                        })
+                                    }}
+                                    className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
+                                >
+                                    <option value="" disabled>Select a reason</option>
+                                    <option value="Incomplete Information">Incomplete Information</option>
+                                    <option value="Invalid Data">Invalid Data</option>
+                                    <option value="Policy Violation">Policy Violation</option>
+                                </select>
+                            </div>
+
+                            <div className="mb-4">
+                                <label className="text-[18px] font-semibold text-black" htmlFor="note">
+                                    Add Note
+                                </label>
+                                <textarea
+                                    id="note"
+                                    value={cancellationState.description}
+                                    onChange={(e)=>{
+                                        setCancellationState({
+                                            ...cancellationState,
+                                            description:e.target.value
+                                        })
+                                    }}
+                                   
+                                    rows="4"
+                                    className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
+                                    placeholder="Add additional details here"
+                                />
+                            </div>
+
+                            <button
+                                onClick={cancellbond}
+                                className="w-full py-3 mt-4 bg-blue-500 text-white rounded-[20px] font-semibold hover:bg-[#6b33e3]"
+                            >
+                                Reject bond
+                            </button>
+                        </div>
+                    </div>:''}
         </>
     );
 }

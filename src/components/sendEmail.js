@@ -2,27 +2,21 @@ import React,{useEffect, useState} from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { ToastContainer,toast } from 'react-toastify';
-import { BASE_URL } from './base_url';
+import { BASE_URL } from '../base_url';
 import axios from 'axios';
-const ManageCustomerSupport = () => {
+const Sendemail = () => {
   const [state,setState]=useState({
     to:'',
     subject:'',
-    messageId:'',
     description:''
   })
   const location=useLocation();
 const getQueryData=()=>{
 let params=new URLSearchParams(location.search)
 let to=params.get('to')
-let subjectEncoded=params.get('subject')
-let subject=decodeURIComponent(subjectEncoded)
-let messageIdEncoded=params.get('messageId')
-let messageId=decodeURIComponent(messageIdEncoded)
+
 setState({
-  to,
-  subject,
-  messageId
+  to
 })
 }
 useEffect(()=>{
@@ -32,25 +26,25 @@ getQueryData()
 const replyToEmail=async()=>{
   try{
     if(state.to.length===0){
-    toast.error("To not found",{containerId:"managecustomersupport"})
+    toast.error("To not found",{containerId:"sendEmail"})
   return;  
   }else if(state.subject.length===0){
-    toast.error("Subject not found",{containerId:"managecustomersupport"})
+    toast.error("Subject not found",{containerId:"sendEmail"})
   return
   }else if(state.description.length===0){
-    toast.error("Please enter description",{containerId:"managecustomersupport"})
+    toast.error("Please enter description",{containerId:"sendEmail"})
   return;
   }
-let response=await axios.post(`${BASE_URL}/sendReply`,state)
-toast.success(response.data.message,{containerId:"managecustomersupport"})
+let response=await axios.post(`${BASE_URL}/sendEmail`,state)
+toast.success("Email sent sucessfully",{containerId:"sendEmail"})
 setTimeout(()=>{
-  navigate(-1)
+navigate(-1)
 },800)
   }catch(e){
 if(e?.response?.data?.error){
-  toast.error(e?.response?.data?.error,{containerId:"managecustomersupport"})
+  toast.error(e?.response?.data?.error,{containerId:"sendEmail"})
 }else{
-  toast.error("Client error please try again",{containerId:"managecustomersupport"})
+  toast.error("Client error please try again",{containerId:"sendEmail"})
 }
   }
 }
@@ -58,7 +52,7 @@ const navigate=useNavigate()
 
   return (
     <>
-    <ToastContainer containerId={"managecustomersupport"}/>
+    <ToastContainer containerId={"sendEmail"}/>
  
     <div className="w-full min-h-screen bg-gray-100 flex items-center justify-center">
       <div
@@ -86,8 +80,15 @@ const navigate=useNavigate()
           <label className="text-gray-600 mb-2 font-semibold text-lg">Subject</label>
           
             <input
+            placeholder='Enter subject'
             value={state.subject}
-            disabled
+            onChange={(e)=>{
+                setState({
+                    ...state,
+                    subject:e.target.value
+                })
+            }}
+           
               type="text"
               className="px-6 py-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
              
@@ -130,4 +131,4 @@ const navigate=useNavigate()
   )
 }
 
-export default ManageCustomerSupport;
+export default Sendemail;
