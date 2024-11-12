@@ -20,9 +20,7 @@ import Supportlink from './Supportlink';
 import Cloudflareverification from './Cloudflareverification';
 import Phoneverificationservice from './Phoneverificationservices';
 import Managecustomersupport from './Managecustomersupport';
-import Paymentapproval from './Paymentapproval';
 import Dashboard from './dashboard';
-import Sendemail from './components/sendEmail';
 const router = createBrowserRouter([
   {
     path: "/usermanagment",
@@ -79,14 +77,9 @@ const router = createBrowserRouter([
     element: <SellerAdminHeader><Managecustomersupport/></SellerAdminHeader>,
   },
   {
-    path: "/",
+    path: "/dashboard",
     element: <SellerAdminHeader><Dashboard/></SellerAdminHeader>,
   },
-  {
-    path:"/Sendemail",
-    element: <SellerAdminHeader><Sendemail/></SellerAdminHeader>,
-  }
- 
 ]);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
