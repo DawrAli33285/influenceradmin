@@ -20,7 +20,7 @@ export default function UserDetail() {
     let { useremail } = useParams()
     const navigate = useNavigate()
     const onDrop = useCallback((acceptedFiles) => {
-        // Use URL.createObjectURL to preview the image
+        
         const file = acceptedFiles[0];
         setState({
             ...state,
