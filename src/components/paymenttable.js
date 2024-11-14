@@ -11,7 +11,7 @@ import { BASE_URL } from '../base_url';
 export default function PaymentTable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
     const [loading, setLoading] = useState(true);
-    const [cancellationData,setCancellationData]=useState([])
+    const [cancellationData, setCancellationData] = useState([])
     const [showMenu, setShowMenu] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
     const [bonds, setBonds] = useState([])
@@ -55,22 +55,22 @@ export default function PaymentTable() {
 
 
     const filteredData = cancellationData?.filter((item) => {
-        
+
         const lowerSearchQuery = searchQuery?.toLowerCase();
-    
-       
-        const matchesSearch = 
+
+
+        const matchesSearch =
             (item?.buyer_id?.user_id?.username?.toLowerCase()?.includes(lowerSearchQuery)) ||
             (item?.bond_id?.issuer_id?.user_id?.username?.toLowerCase()?.includes(lowerSearchQuery)) ||
             (item?.status?.toLowerCase()?.includes(lowerSearchQuery));
-    
-       
+
+
         const matchesStatus = filters.status ? item.status === filters.status : true;
-    
-        
+
+
         const matchesBondType = filters.bondType ? item.bondType === filters.bondType : true;
-    
-        
+
+
         const checkAmountRange = (range, amount) => {
             switch (range) {
                 case 'Under $1,000':
@@ -89,19 +89,19 @@ export default function PaymentTable() {
                     return true;
             }
         };
-    
-        
+
+
         const matchesAmountRange = filters.amountRange ? checkAmountRange(filters.amountRange, item.bond_price * item.total_bonds) : true;
-    
-       
+
+
         return matchesSearch && matchesStatus && matchesBondType && matchesAmountRange;
     });
-    
+
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-    
+
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
     const handlePageClick = (pageNumber) => {
@@ -116,44 +116,44 @@ export default function PaymentTable() {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
-const getCancellationData=async()=>{
-    try{
-let response=await axios.get(`${BASE_URL}/getCancellations`)
-console.log("RESPONSE")
-console.log(response.data)
-setCancellationData(response.data.cancellationRates)
-toast.success(response?.data?.message,{containerId:"paymenttable"})
-setLoading(false)
-    }catch(e){
-if(e?.response?.data?.error){
-toast.error(e?.response?.data?.error,{containerId:"paymenttable"})
-}else{
-toast.error("Client error please try again",{containerId:"paymenttable"})
-}
+    const getCancellationData = async () => {
+        try {
+            let response = await axios.get(`${BASE_URL}/getCancellations`)
+            console.log("RESPONSE")
+            console.log(response.data)
+            setCancellationData(response.data.cancellationRates)
+            toast.success(response?.data?.message, { containerId: "paymenttable" })
+            setLoading(false)
+        } catch (e) {
+            if (e?.response?.data?.error) {
+                toast.error(e?.response?.data?.error, { containerId: "paymenttable" })
+            } else {
+                toast.error("Client error please try again", { containerId: "paymenttable" })
+            }
+        }
     }
-}
 
 
-   useEffect(()=>{
-    getCancellationData();
-   },[])
+    useEffect(() => {
+        getCancellationData();
+    }, [])
 
-    
-    
+
+
 
     const updateStatus = async (id) => {
         try {
             let response = await axios.get(`${BASE_URL}/approveCancellationStatus/${id}`)
-           setCancellationData((prev)=>{
-            let old=[...prev]
-            let getIndex=old.findIndex(u=>u?._id==id)
-            let newitem={
-                ...old[getIndex],
-                status:"APPROVED"
-            }
-            old[getIndex]=newitem
-            return old
-           })
+            setCancellationData((prev) => {
+                let old = [...prev]
+                let getIndex = old.findIndex(u => u?._id == id)
+                let newitem = {
+                    ...old[getIndex],
+                    status: "APPROVED"
+                }
+                old[getIndex] = newitem
+                return old
+            })
             toast.success(response?.data?.message, { containerId: "paymenttable" })
             setShowMenu(!showMenu)
         } catch (e) {
@@ -183,7 +183,7 @@ toast.error("Client error please try again",{containerId:"paymenttable"})
             {loading == true ? <div className="flex justify-center items-center">
                 <MoonLoader color="#6B33E3" size={100} />
             </div> : <div className="bg-white p-[20px] rounded-[20px] shadow-md">
-                <div className="flex justify-between items-center mb-[20px]">
+                <div className="flex justify-between xl:flex-row flex-col xl:items-center mb-[20px]">
                     <h1 className=" text-[24px] font-semibold">Payment Managment</h1>
                     <div className='flex gap-[20px] items-center'>
                         <div>
@@ -223,7 +223,7 @@ toast.error("Client error please try again",{containerId:"paymenttable"})
                             </select>
                         </div>
 
-                     
+
                     </div>
                 )}
 
@@ -235,52 +235,114 @@ toast.error("Client error please try again",{containerId:"paymenttable"})
                     </div>
                 ) : (
                     <>
-                        {currentItems?.length > 0 ? <table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
-                            <thead>
-                                <tr className="bg-[#FDFBFD]">
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Bond ID</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Buyer</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Issuer</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Cancellation Amount</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Cancellation Reason</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
-                                    <th className="p-[10px] text-left border-l border-r border-t border-gray-300">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {currentItems?.map((bond, index) => (
-                                    <tr key={bond.id} className="border-b">
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?._id}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.buyer_id?.user_id?.username}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.issuer_id?.user_id?.username}</td>
-                                      
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.bond_issuerance_amount}</td>
-                                        
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.reason}</td>
-                                        <td className={`p-[10px] border-l border-gray-300 ${bond?.status?bond?.status:`PENDING`}`}>
-                                            {bond?.status?bond?.status:`PENDING`}
-                                        </td>
-                                        <td className="p-[10px] border-l border-r border-gray-300 relative">
-                                            <button onClick={() => handleActionClick(index)} className="focus:outline-none">
-                                                <BsThreeDotsVertical />
-                                            </button>
-                                            {showMenu === index && (
-                                                <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
-                                                    <ul>
-                                                        
-                                                        <li onClick={() => {
-                                                            
-                                                        }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/payment-detail/${bond?._id}`}>View</Link></li>
-                                                    </ul>
+                        {currentItems?.length > 0 ?
+                            <div>
+                                <table className="min-w-full xl:table hidden table-auto border-gray-300 border-collapse mt-4">
+                                    <thead>
+                                        <tr className="bg-[#FDFBFD]">
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Bond ID</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Buyer</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Issuer</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Cancellation Amount</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Cancellation Reason</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
+                                            <th className="p-[10px] text-left border-l border-r border-t border-gray-300">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {currentItems?.map((bond, index) => (
+                                            <tr key={bond.id} className="border-b">
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?._id}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.buyer_id?.user_id?.username}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.issuer_id?.user_id?.username}</td>
+
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.bond_issuerance_amount}</td>
+
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.reason}</td>
+                                                <td className={`p-[10px] border-l border-gray-300 ${bond?.status ? bond?.status : `PENDING`}`}>
+                                                    {bond?.status ? bond?.status : `PENDING`}
+                                                </td>
+                                                <td className="p-[10px] border-l border-r border-gray-300 relative">
+                                                    <button onClick={() => handleActionClick(index)} className="focus:outline-none">
+                                                        <BsThreeDotsVertical />
+                                                    </button>
+                                                    {showMenu === index && (
+                                                        <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
+                                                            <ul>
+
+                                                                <li onClick={() => {
+
+                                                                }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/payment-detail/${bond?._id}`}>View</Link></li>
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                <div className='w-full xl:hidden block'>
+                                    <div className="xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
+                                        {currentItems?.map((bond, index) => (
+                                            <div key={bond.id} className="grid xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond ID</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.bond_id?._id.slice(0, 6)}...</p>
                                                 </div>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table> : <div className='w-full flex items-center justify-center'>
-                            <p>No Record Found</p>
-                        </div>}
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Buyer</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.buyer_id?.user_id?.username}</p>
+                                                </div>
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Issuer</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.bond_id?.issuer_id?.user_id?.username}</p>
+                                                </div>
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Cancellation Amount</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.bond_id?.bond_issuerance_amount}</p>
+                                                </div>
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Cancellation Reason</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.reason}</p>
+                                                </div>
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Status</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.status}</p>
+                                                </div>
+
+
+                                                <div className="flex flex-col gap-[10px] relative">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Action</h1>
+                                                    <button
+                                                        onClick={() => handleActionClick(index)}
+                                                        className="focus:outline-none"
+                                                    >
+                                                        <BsThreeDotsVertical />
+                                                    </button>
+                                                    {showMenu === index && (
+                                                        <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
+                                                            <ul>
+
+                                                                <li onClick={() => {
+
+                                                                }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/payment-detail/${bond?._id}`}>View</Link></li>
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                </div>
+                            </div> : <div className='w-full flex items-center justify-center'>
+                                <p>No Record Found</p>
+                            </div>}
 
                         <div className="flex justify-end mt-4 space-x-2">
                             <button

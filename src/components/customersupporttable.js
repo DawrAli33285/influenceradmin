@@ -188,7 +188,7 @@ export default function CustomerSupportTable() {
             {loading == true ? <div className="flex justify-center items-center">
                 <MoonLoader color="#6B33E3" size={100} />
             </div> : <div className="bg-white p-[20px] rounded-[20px] shadow-md">
-                <div className="flex justify-between items-center mb-[20px]">
+                <div className="flex justify-between lg:flex-rows flex-col xl:items-center mb-[20px]">
                     <h1 className=" text-[24px] font-semibold">Support Requests</h1>
                     <div className='flex gap-[20px] items-center'>
                         <div>
@@ -255,32 +255,99 @@ export default function CustomerSupportTable() {
                     </div>
                 ) : (
                     <>
-                        {currentItems?.length > 0 ? <table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
-                            <thead>
-                                <tr className="bg-[#FDFBFD]">
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Service Name</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Description</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Additional info</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {currentItems?.map((bond, index) => (
-                                    <tr key={bond.id} className="border-b">
-                                        <td className="p-[10px] border-l border-gray-300">{bond?._id}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.title}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_price}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.validity_number}</td>
-                                        <td className="p-[10px] border-l border-gray-300 px-[1rem] cursor-pointer">
-                                        <BsThreeDotsVertical />
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table> : <div className='w-full flex items-center justify-center'>
-                            <p>No Record Found</p>
-                        </div>}
+                        {currentItems?.length > 0 ?
+                            <div>
+                                <table className="min-w-full xl:table hidden table-auto border-gray-300 border-collapse mt-4">
+                                    <thead>
+                                        <tr className="bg-[#FDFBFD]">
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Service Name</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Description</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Additional info</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {currentItems?.map((bond, index) => (
+                                            <tr key={bond.id} className="border-b">
+                                                <td className="p-[10px] border-l border-gray-300">{bond?._id}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.title}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.bond_price}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.validity_number}</td>
+                                                <td className="p-[10px] border-l border-gray-300 px-[1rem] cursor-pointer">
+                                                    <BsThreeDotsVertical />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                <div className='w-full xl:hidden block'>
+                                    <div className="xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
+                                        {currentItems?.map((bond, index) => (
+                                            <div key={bond.id} className="grid xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Service Name</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?._id?.slice(0, 6)}...</p>
+                                                </div>
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Description</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.title}</p>
+                                                </div>
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Additional info</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.bond_price}</p>
+                                                </div>
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Status</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.status}</p>
+                                                </div>
+                                                <div className="flex flex-col gap-[10px] relative">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Action</h1>
+                                                    <button
+                                                        onClick={() => handleActionClick(index)}
+                                                        className="focus:outline-none"
+                                                    >
+                                                        <BsThreeDotsVertical />
+                                                    </button>
+                                                    {showMenu === index && (
+                                                        <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
+                                                            <ul>
+                                                                <li
+                                                                    onClick={() => updateStatus("APPROVED", bond?._id)}
+                                                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                >
+                                                                    Approve
+                                                                </li>
+                                                                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                                                    <Link to={`/bond-detail/${bond?._id}`}>Edit</Link>
+                                                                </li>
+                                                                <li
+                                                                    onClick={() => updateStatus("REJECTED", bond?._id)}
+                                                                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                                                >
+                                                                    Suspend
+                                                                </li>
+                                                                <li
+                                                                    className="px-4 py-2 hover:bg-gray-100 text-red-500 cursor-pointer"
+                                                                    onClick={() => deleteBond(bond?._id)}
+                                                                >
+                                                                    Delete
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                </div>
+                            </div>
+                            : <div className='w-full flex items-center justify-center'>
+                                <p>No Record Found</p>
+                            </div>}
 
                         <div className="flex justify-end mt-4 space-x-2">
                             <button

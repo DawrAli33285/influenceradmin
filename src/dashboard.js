@@ -9,7 +9,7 @@ import NewUsersChart from "./components/userchart";
 export default function Dashboard() {
     return (
         <div className="h-[100vh]">
-            <div className="w-full min-h-[500px] h-full  overflow-x-auto  rounded-[20px] mt-[20px] px-[20px] py-[40px]">
+            <div className="w-full h-[100vh]  overflow-x-auto  rounded-[20px] mt-[20px] px-[20px] py-[40px]">
                 <SellerNotificationCards />
                 <div className="w-full grid-cols-1 xl:grid-cols-2 grid gap-[20px]">
                     <div className="w-full min-h-[500px] rounded-[20px] mt-[20px] bg-white">
