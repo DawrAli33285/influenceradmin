@@ -11,8 +11,8 @@ import { BASE_URL } from '../base_url';
 export default function Paymentapprovaltable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
     const [loading, setLoading] = useState(true);
-    const [cancellationData,setCancellationData]=useState([])
-    const [transactionData,setTransactionData]=useState([])
+    const [cancellationData, setCancellationData] = useState([])
+    const [transactionData, setTransactionData] = useState([])
     const [showMenu, setShowMenu] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
     const [bonds, setBonds] = useState([])
@@ -25,7 +25,7 @@ export default function Paymentapprovaltable() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
-    const statusOptions = ['SUCESS','FAILED','REJECTED'];
+    const statusOptions = ['SUCESS', 'FAILED', 'REJECTED'];
     const amountRangeOptions = [
         'Under $1,000',
         '$1,000 - $5,000',
@@ -57,15 +57,15 @@ export default function Paymentapprovaltable() {
 
     const filteredData = transactionData?.filter((item) => {
         const lowerSearchQuery = searchQuery?.toLowerCase();
-    
-       
-        const matchesSearch = 
-            (item?.payment_method_id?.method_name?.toLowerCase()?.includes(lowerSearchQuery)) || 
+
+
+        const matchesSearch =
+            (item?.payment_method_id?.method_name?.toLowerCase()?.includes(lowerSearchQuery)) ||
             (item?.status?.toLowerCase()?.includes(lowerSearchQuery));
-        
+
         const matchesStatus = filters.status ? item.status === filters.status : true;
         const matchesBondType = filters.bondType ? item.bondType === filters.bondType : true;
-        
+
         const checkAmountRange = (range, amount) => {
             switch (range) {
                 case 'Under $1,000':
@@ -84,17 +84,17 @@ export default function Paymentapprovaltable() {
                     return true;
             }
         };
-    
+
         const matchesAmountRange = filters.amountRange ? checkAmountRange(filters.amountRange, item.bond_price * item.total_bonds) : true;
-    
+
         return matchesSearch && matchesStatus && matchesBondType && matchesAmountRange;
     });
-    
+
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = filteredData?.slice(indexOfFirstItem, indexOfLastItem);
-    
+
     const totalPages = Math.ceil(filteredData?.length / itemsPerPage);
 
     const handlePageClick = (pageNumber) => {
@@ -109,30 +109,30 @@ export default function Paymentapprovaltable() {
         setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
     };
 
-const getTransactionData=async()=>{
-    try{
-let response=await axios.get(`${BASE_URL}/get-payments`)
-console.log("RESPONSE")
-console.log(response.data)
-setTransactionData(response.data.transactions)
-toast.success(response?.data?.message,{containerId:"paymentapproval"})
-setLoading(false)
-    }catch(e){
-if(e?.response?.data?.error){
-toast.error(e?.response?.data?.error,{containerId:"paymentapproval"})
-}else{
-toast.error("Client error please try again",{containerId:"paymentapproval"})
-}
+    const getTransactionData = async () => {
+        try {
+            let response = await axios.get(`${BASE_URL}/get-payments`)
+            console.log("RESPONSE")
+            console.log(response.data)
+            setTransactionData(response.data.transactions)
+            toast.success(response?.data?.message, { containerId: "paymentapproval" })
+            setLoading(false)
+        } catch (e) {
+            if (e?.response?.data?.error) {
+                toast.error(e?.response?.data?.error, { containerId: "paymentapproval" })
+            } else {
+                toast.error("Client error please try again", { containerId: "paymentapproval" })
+            }
+        }
     }
-}
 
 
-   useEffect(()=>{
-   getTransactionData();
-   },[])
+    useEffect(() => {
+        getTransactionData();
+    }, [])
 
-    
-    
+
+
 
 
 
@@ -144,53 +144,53 @@ toast.error("Client error please try again",{containerId:"paymentapproval"})
 
 
 
-const suspendTransaction=async(id)=>{
-    try{
-let response=await axios.patch(`${BASE_URL}/suspendPayment/${id}`)
-setTransactionData((prev)=>{
-    let old=[...prev]
-    let findIndex=old.findIndex(u=>u._id==id)
-    old[findIndex]={
-        ...old[findIndex],
-        status:"REJECTED"
+    const suspendTransaction = async (id) => {
+        try {
+            let response = await axios.patch(`${BASE_URL}/suspendPayment/${id}`)
+            setTransactionData((prev) => {
+                let old = [...prev]
+                let findIndex = old.findIndex(u => u._id == id)
+                old[findIndex] = {
+                    ...old[findIndex],
+                    status: "REJECTED"
+                }
+                return old
+            })
+            setShowMenu(false)
+            toast.success("Payment rejected sucessfully", { containerId: "paymentapproval" })
+        } catch (e) {
+            if (e?.response?.data?.error) {
+                toast.error(e?.response?.data?.error, { containerId: "paymentapproval" })
+            } else {
+                toast.error("Client error please try again", { containerId: "paymentapproval" })
+            }
+        }
     }
-    return old
-})
-setShowMenu(false)
-toast.success("Payment rejected sucessfully",{containerId:"paymentapproval"})
-    }catch(e){
-if(e?.response?.data?.error){
-    toast.error(e?.response?.data?.error,{containerId:"paymentapproval"})
-}else{
-    toast.error("Client error please try again",{containerId:"paymentapproval"})
-}
-    }
-}
 
 
 
-const approveTransaction=async(id)=>{
-    try{
-let response=await axios.patch(`${BASE_URL}/approvePayment/${id}`)
-setTransactionData((prev)=>{
-    let old=[...prev]
-    let findIndex=old.findIndex(u=>u._id==id)
-    old[findIndex]={
-        ...old[findIndex],
-        status:"SUCESS"
+    const approveTransaction = async (id) => {
+        try {
+            let response = await axios.patch(`${BASE_URL}/approvePayment/${id}`)
+            setTransactionData((prev) => {
+                let old = [...prev]
+                let findIndex = old.findIndex(u => u._id == id)
+                old[findIndex] = {
+                    ...old[findIndex],
+                    status: "SUCESS"
+                }
+                return old
+            })
+            setShowMenu(false)
+            toast.success("Payment approved sucessfully", { containerId: "paymentapproval" })
+        } catch (e) {
+            if (e?.response?.data?.error) {
+                toast.error(e?.response?.data?.error, { containerId: "paymentapproval" })
+            } else {
+                toast.error("Client error please try again", { containerId: "paymentapproval" })
+            }
+        }
     }
-    return old
-})
-setShowMenu(false)
-toast.success("Payment approved sucessfully",{containerId:"paymentapproval"})
-    }catch(e){
-if(e?.response?.data?.error){
-    toast.error(e?.response?.data?.error,{containerId:"paymentapproval"})
-}else{
-    toast.error("Client error please try again",{containerId:"paymentapproval"})
-}
-    }
-}
 
 
 
@@ -241,7 +241,7 @@ if(e?.response?.data?.error){
                             </select>
                         </div>
 
-                     
+
                     </div>
                 )}
 
@@ -253,51 +253,105 @@ if(e?.response?.data?.error){
                     </div>
                 ) : (
                     <>
-                        {currentItems?.length > 0 ? <table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
-                            <thead>
-                                <tr className="bg-[#FDFBFD]">
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Bond ID</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Method Name</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">No Of Bonds</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Amount</th>
-                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
-                                    <th className="p-[10px] text-left border-l border-r border-t border-gray-300">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {currentItems?.map((bond, index) => (
-                                    <tr key={bond.id} className="border-b">
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?._id}</td>
-                                        <td className="p-[10px] border-l border-gray-300">{bond?.payment_method_id?.method_name}</td>
-                                        <td className={`p-[10px] border-l border-gray-300`}>
-                                           {bond?.no_of_bonds}
-                                        </td>
-                                        <td className={`p-[10px] border-l border-gray-300`}>
-                                            ${bond?.amount?.toString()}
-                                        </td> 
-                                        <td className={`p-[10px] border-l border-gray-300 ${bond?.status?bond?.status:`PENDING`}`}>
-                                            {bond?.status?bond?.status:`PENDING`}
-                                        </td>
-                                        <td className="p-[10px] border-l border-r border-gray-300 relative">
-                                            <button onClick={() => handleActionClick(index)} className="focus:outline-none">
-                                                <BsThreeDotsVertical />
-                                            </button>
-                                            {showMenu === index && (
-                                                <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
-                                                    <ul>
-                                                        
-                                                        <li onClick={()=>suspendTransaction(bond?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reject</li>
-                                                        <li onClick={()=>approveTransaction(bond?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
-                                                    </ul>
+                        {currentItems?.length > 0 ?
+                            <div>
+                                <table className="min-w-full xl:table hidden table-auto border-gray-300 border-collapse mt-4">
+                                    <thead>
+                                        <tr className="bg-[#FDFBFD]">
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Bond ID</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Method Name</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">No Of Bonds</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Amount</th>
+                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
+                                            <th className="p-[10px] text-left border-l border-r border-t border-gray-300">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {currentItems?.map((bond, index) => (
+                                            <tr key={bond.id} className="border-b">
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?._id}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.payment_method_id?.method_name}</td>
+                                                <td className={`p-[10px] border-l border-gray-300`}>
+                                                    {bond?.no_of_bonds}
+                                                </td>
+                                                <td className={`p-[10px] border-l border-gray-300`}>
+                                                    ${bond?.amount?.toString()}
+                                                </td>
+                                                <td className={`p-[10px] border-l border-gray-300 ${bond?.status ? bond?.status : `PENDING`}`}>
+                                                    {bond?.status ? bond?.status : `PENDING`}
+                                                </td>
+                                                <td className="p-[10px] border-l border-r border-gray-300 relative">
+                                                    <button onClick={() => handleActionClick(index)} className="focus:outline-none">
+                                                        <BsThreeDotsVertical />
+                                                    </button>
+                                                    {showMenu === index && (
+                                                        <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
+                                                            <ul>
+
+                                                                <li onClick={() => suspendTransaction(bond?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reject</li>
+                                                                <li onClick={() => approveTransaction(bond?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                                <div className='w-full xl:hidden block'>
+                                    <div className="xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
+                                        {currentItems?.map((bond, index) => (
+                                            <div key={bond.id} className="grid xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond ID</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.bond_id?._id.slice(0, 6)}...</p>
                                                 </div>
-                                            )}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table> : <div className='w-full flex items-center justify-center'>
-                            <p>No Record Found</p>
-                        </div>}
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Method Name</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.payment_method_id?.method_name}</p>
+                                                </div>
+
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">No Of Bonds</h1>
+                                                    <p className="text-[16px] font-semibold"> {bond?.no_of_bonds}</p>
+                                                </div>
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Amount</h1>
+                                                    <p className="text-[16px] font-semibold">${bond?.amount?.toString()}</p>
+                                                </div>
+                                                <div className="flex flex-col gap-[10px]">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Status</h1>
+                                                    <p className="text-[16px] font-semibold">{bond?.status ? bond?.status : `PENDING`}</p>
+                                                </div>
+
+
+                                                <div className="flex flex-col gap-[10px] relative">
+                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Action</h1>
+                                                    <button
+                                                        onClick={() => handleActionClick(index)}
+                                                        className="focus:outline-none"
+                                                    >
+                                                        <BsThreeDotsVertical />
+                                                    </button>
+                                                    {showMenu === index && (
+                                                        <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
+                                                            <ul>
+
+                                                                <li onClick={() => suspendTransaction(bond?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Reject</li>
+                                                                <li onClick={() => approveTransaction(bond?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
+                                                            </ul>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                </div>
+                            </div> : <div className='w-full flex items-center justify-center'>
+                                <p>No Record Found</p>
+                            </div>}
 
                         <div className="flex justify-end mt-4 space-x-2">
                             <button

@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { MoonLoader } from 'react-spinners';
 import { ToastContainer, toast } from 'react-toastify';
 import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { BASE_URL } from '../base_url';
@@ -122,13 +123,13 @@ const UserTable = () => {
         }
     }
 
-
+    const navigate = useNavigate();
     return (
         <>
 
             <ToastContainer containerId="usermanagement" limit={1} />
-            <div className="bg-white p-[20px] rounded-[20px] shadow-md">
-                <div className="flex xl:flex-row flex-col gap-[20px] justify-between xl:items-center mb-[20px]">
+            <div className="bg-white max-h-[700px]  overflow-y-auto p-[20px] rounded-[20px] shadow-md">
+                <div className="flex justify-between items-center mb-[20px]">
                     <h1 className="text-[#2563EB] text-[24px] font-semibold">User Listing</h1>
                     <div className='flex gap-[20px] items-center'>
                         <div>

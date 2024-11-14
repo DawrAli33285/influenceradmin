@@ -64,7 +64,7 @@ setTimeout(()=>{
     const { bondid } = params
     const {paymentid}=params;
     const dummyData = {
-        bondid: "BND12345678901234567890", // Bond ID, sliced to show only first 20 characters
+        bondid: "BND12345678901234567890", 
         bond: {
             title: "Municipal Bond 2024",
             issuer_id: {
@@ -73,15 +73,15 @@ setTimeout(()=>{
                 }
             },
             total_bonds: 1000,
-            bond_price: 50 // Assuming each bond is priced at $50
+            bond_price: 50 
         },
         editData: {
-            title: "Municipal Bond 2024", // Editable bond title
-            issuer_id: "IssuerCompany123", // Editable issuer ID
-            bond_issuerance_amount: 50000, // Editable issuance amount
-            task_type: "2024-11-01" // Editable issuance date
+            title: "Municipal Bond 2024", 
+            issuer_id: "IssuerCompany123", 
+            bond_issuerance_amount: 50000, 
+            task_type: "2024-11-01" 
         },
-        isedit: true, // Toggle for edit mode
+        isedit: true,
         state: {
             issuers: [
                 {

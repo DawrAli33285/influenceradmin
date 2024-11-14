@@ -8,6 +8,7 @@ import { BASE_URL } from './base_url';
 import axios from 'axios';
 export default function UserDetail() {
     const [avatar, setAvatar] = useState(null);
+    const [myAvatar,setMyAvatar]=useState("")
     const [state, setState] = useState({
         email: '',
         username: '',
@@ -22,12 +23,14 @@ export default function UserDetail() {
     const onDrop = useCallback((acceptedFiles) => {
         
         const file = acceptedFiles[0];
-        setState({
-            ...state,
+        setState((prevState) => ({
+            ...prevState,
             avatar: file
-        })
+        }));
+        
         if (file) {
             setAvatar(URL.createObjectURL(file));
+            setMyAvatar(URL.createObjectURL(file))
         }
     }, []);
 
@@ -39,6 +42,12 @@ export default function UserDetail() {
     useEffect(() => {
         getUserData();
     }, [])
+    const convertUrlToFile = async (url) => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        const file = new File([blob], "avatar.jpg", { type: blob.type });
+        return file;
+    };
 
     const getUserData = async () => {
         try {
@@ -46,6 +55,7 @@ export default function UserDetail() {
 
             let response = await axios.get(`${BASE_URL}/getUser/${useremail}`)
             setState(response.data.user)
+            setMyAvatar(response.data.user.avatar)
             setLoading(false)
             console.log(response.data)
         } catch (e) {
@@ -60,20 +70,33 @@ export default function UserDetail() {
         try {
             console.log(state)
             const formData = new FormData();
+        
 
             for (const key in state) {
                 if (state.hasOwnProperty(key)) {
                     const value = state[key];
 
                     if (Array.isArray(value)) {
-                        value.forEach((file, index) => {
-                            formData.append(`${key}[${index}]`, file);
-                        });
+                        
                     } else {
                         formData.append(key, value);
                     }
                 }
             }
+            let avatarFile;
+
+
+            if(typeof myAvatar==="string"){
+                avatarFile=await convertUrlToFile(myAvatar)
+              
+                formData.append("avatar",avatarFile)
+            }else{
+                formData.append("avatar",myAvatar)
+            }
+
+         
+
+           
             let response = await axios.patch(`${BASE_URL}/editUser/${useremail}`, formData)
 
 
@@ -106,9 +129,9 @@ export default function UserDetail() {
                             className="w-[150px] h-[150px] rounded-[100%] border-dashed border-2 border-gray-300 xl:m-0 m-auto flex items-center justify-center cursor-pointer"
                         >
                             <input {...getInputProps()} />
-                            {state?.avatar ? (
+                            {myAvatar ? (
                                 <img
-                                    src={state?.avatar}
+                                    src={myAvatar}
                                     alt="avatar"
                                     className="w-full h-full object-cover rounded-[100%]"
                                 />

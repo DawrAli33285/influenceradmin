@@ -11,7 +11,7 @@ const Phoneverificationservice = () => {
                                                 Phone verification Services
                                         </h2>
                                         <p className='text-[16px] py-[1rem] leading-[35px]'>
-                                                The phone verification services page provides you with the tools needed to confirm the identity and contact details of users through relaible phone-based verification methods.
+                                        The Phone Verification Services page provides you with the tools needed to confirm the identity and contact details of users through reliable phone-based verification methods. Verifying users’ phone numbers is a critical step in enhancing platform security, improving user account integrity, and ensuring accurate communication.
                                         </p>
 
                                 </div>
@@ -22,7 +22,7 @@ const Phoneverificationservice = () => {
                                                 Why phone verification matters
                                         </h2>
                                         <p className='text-[16px] py-[1rem] leading-[35px]'>
-                                                The phone verification services page provides you with the tools needed to confirm the identity and contact details of users through relaible phone-based verification methods.
+                                        Phone verification serves as an essential safeguard in today’s digital landscape. By confirming phone numbers, we reduce the risk of unauthorized access and fraudulent activity, enabling a more secure environment for both users and administrators. Verified contact numbers allow for effective communication in scenarios requiring urgent updates, password recovery, transaction confirmations, and other essential notifications. This approach reinforces user trust and strengthens the overall security and reliability of the platform.
                                         </p>
 
 
@@ -33,7 +33,7 @@ const Phoneverificationservice = () => {
                                                 One-Time Password(OTP)verification
                                         </h2>
                                         <p className='text-[16px] py-[1rem] leading-[35px]'>
-                                                The phone verification services page provides you with the tools needed to confirm the identity and contact details of users through relaible phone-based verification methods.
+                                        Send a unique, time-sensitive code via SMS to the user’s registered phone number. The OTP must be entered by the user within a limited timeframe, providing quick and reliable verification.
                                         </p>
 
 

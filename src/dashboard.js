@@ -4,6 +4,7 @@ import BondTable from "./components/bondtable";
 import SellerAdminHeader from "./components/header";
 import CumulativeIssuanceChart from "./components/linechart";
 import SellerNotificationCards from "./components/sellercards";
+import { MoonLoader } from 'react-spinners';
 import TransactionChart from "./components/transactionchart";
 import NewUsersChart from "./components/userchart";
 import axios from "axios";
@@ -19,11 +20,13 @@ export default function Dashboard() {
        buyers:0
 
     })
+    const [loading,setLoading]=useState(true)
     const getDashboardData=async()=>{
         try{
 let response=await axios.get(`${BASE_URL}/getDashboardData`)
 console.log("RESPONSE IS")
 console.log(response.data)
+setLoading(false)
 setState(response.data)
         }catch(e){
 
@@ -34,13 +37,11 @@ useEffect(()=>{
 },[])
 
     return (
-        <div className="h-[100vh]">
-            <div className="w-full h-[100vh]  overflow-x-auto  rounded-[20px] mt-[20px] px-[20px] py-[40px]">
-<<<<<<< HEAD
-                <SellerNotificationCards />
-=======
+        <>
+     
+        <div className={`h-[100vh] ${loading?'flex justify-center items-center':''}`}>
+           {loading?<MoonLoader color="#6B33E3" size={100} />: <div className="w-full h-[100vh]  overflow-x-auto  rounded-[20px] mt-[20px] px-[20px] py-[40px]">
                 <SellerNotificationCards setState={setState} state={state}/>
->>>>>>> 2667579706b720be5eb56df0eb047c0c13b2bf45
                 <div className="w-full grid-cols-1 xl:grid-cols-2 grid gap-[20px]">
                     <div className="w-full min-h-[500px] rounded-[20px] mt-[20px] bg-white">
                         <SponsorBondsBarChart setState={setState} bondGraph={state?.bondGraph} />
@@ -61,7 +62,8 @@ useEffect(()=>{
                 <div className="mt-[20px]">
                     <BondTable />
                 </div>
-            </div>
+            </div>}
         </div>
+        </>
     )
 }
