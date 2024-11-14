@@ -22,7 +22,9 @@ export default function PaymentDetail() {
         try{
 let response=await axios.get(`${BASE_URL}/cancelBond/${paymentid}`)
 toast.success(response?.data?.message)  
-navigate(-1)
+setTimeout(()=>{
+    navigate(-1)
+},800)
         }catch(e){
             if(e?.response?.data?.error){
                 toast.error(e?.response?.data?.error,{containerId:"paymentdetail"})
@@ -148,7 +150,9 @@ const rejectCancellation=async()=>{
 try{
 let response=await axios.get(`${BASE_URL}/rejectCancellation/${paymentid}`)
 toast.success(response.data.message,{containerId:"paymentdetail"})
-navigate('/paymentmanagement')
+setTimeout(()=>{
+    navigate('/paymentmanagement')
+},800)
 }catch(e){
     if(e?.response?.data?.error){
         toast.error(e?.response?.data?.error,{containerId:"paymentdetail"})

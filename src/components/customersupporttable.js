@@ -3,7 +3,8 @@ import { MoonLoader } from 'react-spinners';
 import { ToastContainer, toast } from 'react-toastify';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { gapi } from 'gapi-script';
 
 import axios from 'axios';
 import { BASE_URL } from '../base_url';
@@ -11,6 +12,8 @@ import { BASE_URL } from '../base_url';
 export default function CustomerSupportTable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
     const [loading, setLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [emails, setEmails] = useState([]);
     const [showMenu, setShowMenu] = useState(null);
     const [showFilters, setShowFilters] = useState(false);
     const [bonds, setBonds] = useState([])
@@ -33,162 +36,193 @@ export default function CustomerSupportTable() {
         'Above $100,000',
     ];
 
-    const handleActionClick = (index) => {
-        setShowMenu(showMenu === index ? null : index);
-    };
-
-    const getStatusClass = (status) => {
-        switch (status) {
-            case 'Active':
-                return 'text-green-500';
-            case 'Suspended':
-                return 'text-red-500';
-            case 'Pending':
-                return 'text-orange-500';
-            default:
-                return '';
+    const navigate=useNavigate();
+    const handleApiError = async (error) => {
+        if (error?.status === 429) {
+            const retryAfter = error.headers['Retry-After'];
+            const waitTime = retryAfter ? parseInt(retryAfter, 10) * 1000 : 5000; 
+            console.log(`Rate limit exceeded. Retrying after ${waitTime}ms...`);
+            await new Promise(resolve => setTimeout(resolve, waitTime));
+            return true; 
         }
+        console.error('Error occurred:', error);
+        return false;
     };
 
-
-
-
-    const filteredData = bonds?.filter((item) => {
-        const matchesSearch = item?.title?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-            item?._id?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-            item?.description?.toLowerCase()?.includes(searchQuery?.toLowerCase());
-
-        const matchesStatus = filters.status ? item.status === filters.status : true;
-
-
-        const matchesBondType = filters.bondType ? item.bondType === filters.bondType : true;
-        const checkAmountRange = (range, amount) => {
-            switch (range) {
-                case 'Under $1,000':
-                    return amount < 1000;
-                case '$1,000 - $5,000':
-                    return amount >= 1000 && amount <= 5000;
-                case '$5,000 - $10,000':
-                    return amount > 5000 && amount <= 10000;
-                case '$10,000 - $50,000':
-                    return amount > 10000 && amount <= 50000;
-                case '$50,000 - $100,000':
-                    return amount > 50000 && amount <= 100000;
-                case 'Above $100,000':
-                    return amount > 100000;
-                default:
-                    return true;
-            }
-        };
-
-        const matchesAmountRange = filters.amountRange ? checkAmountRange(filters.amountRange, item.bond_price * item.total_bonds) : true;
-
-        return matchesSearch && matchesStatus && matchesBondType && matchesAmountRange;
-    });
-
-
-
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-
-    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-    const handlePageClick = (pageNumber) => {
-        setCurrentPage(pageNumber);
-    };
-
-    const handleNextPage = () => {
-        setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
-    };
-
-    const handlePreviousPage = () => {
-        setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
-    };
-
-    useEffect(() => {
-        getBonds();
-    }, [searchQuery])
-
-
-    const getBonds = async () => {
+    const exponentialBackoff = async (fn, retries = 5, delay = 1000) => {
         try {
-            let response = await axios.get(`${BASE_URL}/get-bonds`)
-            setLoading(false)
-            setBonds(response.data.bonds)
-
-            console.log(response.data)
-        } catch (e) {
-            if (e?.response?.data?.error) {
-                toast.error(e?.response?.data?.error, { containerId: "bondmanagement" })
-            } else {
-                toast.error("Client error please try again", { containerId: "bondmanagement" })
+            return await fn(); 
+        } catch (error) {
+            if (retries <= 0 || !(await handleApiError(error))) {
+                throw error; 
             }
+       
+            console.log(`Retrying after ${delay}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return exponentialBackoff(fn, retries - 1, delay * 2); 
         }
-    }
+    };
 
-    const deleteBond = async (id) => {
-        try {
-            let response = await axios.delete(`${BASE_URL}/deleteBond/${id}`)
-            setBonds((prev) => {
-                let old = [...prev]
-                let newold = old.filter(u => u?._id != id)
-                return newold
-            })
-            toast.success(response.data.message, { containerId: "bondmanagement" })
-            setShowMenu(!showMenu)
-        } catch (e) {
-            if (e?.response?.data?.error) {
-                toast.error(e?.response?.data?.error, { containerId: "bondmanagement" })
-            } else {
-                toast.error("Client error please try again", { containerId: "bondmanagement" })
-            }
-        }
-    }
 
-    const updateStatus = async (status, id) => {
-        try {
-            let response = await axios.patch(`${BASE_URL}/update-status/${status}/${id}`)
-            setBonds((prev) => {
-                let old = [...prev]
-                let getIndex = old.findIndex(u => u?._id == id)
-                let newbond = {
-                    ...old[getIndex],
-                    status
-                }
-                old[getIndex] = newbond
-                return old
+const extractEmail = (from) => {
+  
+    const match = from.match(/<([^>]+)>/);
+    return match ? match[1] : from;
+};
 
-            })
-            toast.success(response?.data?.message, { containerId: "bondmanagement" })
-            setShowMenu(!showMenu)
-        } catch (e) {
-            if (e?.response?.data?.error) {
-                toast.error(e?.response?.data?.error, { containerId: "bondmanagement" })
-            } else {
-                toast.error("Client error please try again", { containerId: "bondmanagement" })
-            }
-        }
-    }
+
+const filteredData = emails?.filter((item) => {
+    const matchesSearch =
+      item?.subject?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+      item?.id?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+      item?.snippet?.toLowerCase()?.includes(searchQuery?.toLowerCase());
+  
+    const matchesFrom = filters.from
+      ? extractEmail(item.from)?.toLowerCase()?.includes(filters.from?.toLowerCase())
+      : true;
+  
+    
+    const matchesReplied =
+      filters.replied !== undefined ? item.replied === filters.replied : true;
+  
+    const matchesStatus = filters.status ? item.status === filters.status : true;
+    const matchesBondType = filters.bondType ? item.bondType === filters.bondType : true;
+  
+    return matchesSearch && matchesFrom && matchesReplied && matchesStatus && matchesBondType;
+  });
+  
+    
+
+const indexOfLastItem = currentPage * itemsPerPage;
+const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+
+
+const handlePageClick = (pageNumber) => {
+    setCurrentPage(pageNumber);
+};
+
+const handleNextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
+};
+
+const handlePreviousPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
+};
+
 
 
 
 
     const filterSearch = (e) => {
         setSearchQuery(e.target.value);
-        console.log(e.target.value);
+        
     };
 
+
+    const initClient = () => {
+        gapi.client.init({
+          apiKey: 'AIzaSyCZ8H0BHeuhGUOisBp5uFeaehKB7sc6Caw', 
+          clientId: '18819315923-dgjfpoa60vhgf4c1ftba93aj6otb6sl3.apps.googleusercontent.com', 
+          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"],
+          scope: "https://www.googleapis.com/auth/gmail.readonly",
+        }).then(() => {
+         
+          const authInstance = gapi.auth2.getAuthInstance();
+          if (authInstance.isSignedIn.get()) {
+            setIsAuthenticated(true);
+            listMessages();
+          }
+        });
+      };
+    
+      
+      useEffect(() => {
+        gapi.load('client:auth2', initClient);
+      }, []);
+    
+   
+      const extractMessageId = (messageId) => {
+        const match = messageId.match(/<([^>]+)>/);
+        return match ? match[1] : "No messageId";
+      };
+      
+      const listMessages = async () => {
+        try {
+            const response = await exponentialBackoff(() =>
+                gapi.client.gmail.users.messages.list({
+                    userId: 'me',
+                    labelIds: ['INBOX'],
+                    q: 'is:unread',
+                })
+            );
+    
+            const messages = response.result.messages || [];
+    
+            const messageDetails = messages.map(async (message) => {
+                const messageResponse = await gapi.client.gmail.users.messages.get({
+                    userId: 'me',
+                    id: message.id,
+                });
+    
+                const emailData = messageResponse.result;
+                const threadId = emailData.threadId;
+    
+                
+                const threadResponse = await gapi.client.gmail.users.threads.get({
+                    userId: 'me',
+                    id: threadId,
+                });
+    
+                const hasReply = threadResponse.result.messages.length > 1;  // Check if more than one message in the thread
+    
+                const headers = emailData.payload.headers;
+                const fromHeader = headers.find((header) => header.name === 'From');
+                const subjectHeader = headers.find((header) => header.name === 'Subject');
+                const messageIdHeader = headers.find((header) => header.name === 'Message-ID');
+    
+                return {
+                    id: emailData.id,
+                    from: fromHeader ? fromHeader.value : 'No sender',
+                    subject: subjectHeader ? subjectHeader.value : 'No subject',
+                    messageId: messageIdHeader ? messageIdHeader.value : 'No Message-ID',
+                    snippet: emailData.snippet,
+                    replied: hasReply,
+                    threadId: threadId  
+                };
+            });
+    
+            Promise.all(messageDetails).then((emails) => {
+                setEmails(emails);
+                setLoading(false);
+            });
+        } catch (error) {
+            toast.error('Failed to fetch emails. Please try again later.', { containerId: 'customersupport' });
+            console.error('Failed to fetch emails:', error);
+        }
+    };
+    
+      
+    
+    
 
 
     return (
         <>
-            <ToastContainer containerId="bondmanagement" limit={1} />
+            <ToastContainer containerId="customersupport" limit={1} />
 
             {loading == true ? <div className="flex justify-center items-center">
                 <MoonLoader color="#6B33E3" size={100} />
+<<<<<<< HEAD
             </div> : <div className="bg-white p-[20px] rounded-[20px] shadow-md">
                 <div className="flex justify-between lg:flex-rows flex-col xl:items-center mb-[20px]">
+=======
+            </div> : <div className="bg-white max-h-[700px]  overflow-y-auto p-[20px] rounded-[20px] shadow-md">
+                <div className="flex justify-between items-center mb-[20px]">
+                 
+>>>>>>> 2667579706b720be5eb56df0eb047c0c13b2bf45
                     <h1 className=" text-[24px] font-semibold">Support Requests</h1>
                     <div className='flex gap-[20px] items-center'>
                         <div>
@@ -213,37 +247,21 @@ export default function CustomerSupportTable() {
                     <div className="absolute bg-white p-4 rounded-lg shadow-lg shadow-md space-y-4 right-[3rem] w-[250px] z-50">
 
                         <div className='mt-4'>
-                            <label htmlFor="status" className="block text-md  font-semibold text-[#272226]">Satus</label>
+                            <label htmlFor="Replied" className="block text-md  font-semibold text-[#272226]">Replied</label>
                             <select
-                                value={filters.status}
-                                onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                                className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                            >
-                                <option value="">All</option>
-                                {statusOptions.map((status) => (
-                                    <option key={status} value={status}>
-                                        {status}
-                                    </option>
-                                ))}
-                            </select>
+  value={filters.replied}
+  onChange={(e) => setFilters({ ...filters, replied: e.target.value === 'true' ? true : e.target.value === 'false' ? false : undefined })}
+  className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
+>
+  <option value="">All</option>
+  <option value="true">True</option>
+  <option value="false">False</option>
+</select>
+
+
                         </div>
 
-                        <div className='mt-4'>
-                            <label htmlFor="range" className="block text-md  font-semibold text-[#272226]">Amount Range</label>
-
-                            <select
-                                value={filters.amountRange}
-                                onChange={(e) => setFilters({ ...filters, amountRange: e.target.value })}
-                                className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                            >
-                                <option value="">All</option>
-                                {amountRangeOptions.map((range) => (
-                                    <option key={range} value={range}>
-                                        {range}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+          
                     </div>
                 )}
 
@@ -255,6 +273,7 @@ export default function CustomerSupportTable() {
                     </div>
                 ) : (
                     <>
+<<<<<<< HEAD
                         {currentItems?.length > 0 ?
                             <div>
                                 <table className="min-w-full xl:table hidden table-auto border-gray-300 border-collapse mt-4">
@@ -348,6 +367,43 @@ export default function CustomerSupportTable() {
                             : <div className='w-full flex items-center justify-center'>
                                 <p>No Record Found</p>
                             </div>}
+=======
+                        {emails?.length > 0 ? <table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
+                            <thead>
+                                <tr className="bg-[#FDFBFD]">
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Email ID</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">From</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Subject</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Message ID</th>
+                                    <th className="p-[10px] text-left border-l border-t border-gray-300">Replied</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {currentItems?.map((bond, index) => {
+
+  return (
+    <tr onClick={()=>{
+navigate(`/Managecustomersupport?to=${extractEmail(bond?.from)}&subject=${bond?.subject}&id=${bond?.id}&messageId=${extractMessageId(bond?.messageId)}`)
+    }}  key={bond.id} className="border-b cursor-pointer">
+      <td className="p-[10px] border-l border-gray-300">{bond?.id}</td>
+      <td className="p-[10px] border-l border-gray-300">{extractEmail(bond?.from)}</td>
+      <td className="p-[10px] border-l border-gray-300">{bond?.subject}</td>
+      <td className="p-[10px] border-l border-gray-300">{extractMessageId(bond?.messageId)}</td>
+      <td className="p-[10px] border-l border-gray-300">
+        {bond?.replied !== undefined && bond?.replied !== null
+          ? bond.replied.toString()  
+          : 'Not found'}  
+      </td>
+    </tr>
+  );
+})}
+
+                            </tbody>
+                        </table> : <div className='w-full flex items-center justify-center'>
+                            <p>No Record Found</p>
+                        </div>}
+>>>>>>> 2667579706b720be5eb56df0eb047c0c13b2bf45
 
                         <div className="flex justify-end mt-4 space-x-2">
                             <button

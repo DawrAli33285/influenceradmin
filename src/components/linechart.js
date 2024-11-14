@@ -12,22 +12,18 @@ const data = [
     { name: '80', value: 29 },
 ];
 
-const CumulativeIssuanceChart = () => {
+const CumulativeIssuanceChart = ({issuanceAmount}) => {
     return (
         <div className="w-full px-[20px] py-[20px]">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-800">
                     Cumulative Issuance Amount
                 </h2>
-                <select className="bg-white border border-gray-300 text-gray-700 py-1 px-3 rounded">
-                    <option>30 days</option>
-                    <option>60 days</option>
-                    <option>90 days</option>
-                </select>
+             
             </div>
             <div className='bg-[#E4E5E7] h-[1px] w-full my-[20px]'></div>
             <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
+                <LineChart data={issuanceAmount} margin={{ top: 10, right: 30, left: 0, bottom: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" tick={{ fontSize: 14 }} />
                     <YAxis

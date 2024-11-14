@@ -43,6 +43,10 @@ const router = createBrowserRouter([
     element: <SellerAdminHeader><PaymentManagment /></SellerAdminHeader>,
   },
   {
+    path: "/paymentapproval",
+    element: <SellerAdminHeader><Paymentapproval /></SellerAdminHeader>,
+  },
+  {
     path: "/payment-detail/:paymentid",
     element: <SellerAdminHeader><PaymentDetail /></SellerAdminHeader>,
   },

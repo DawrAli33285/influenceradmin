@@ -25,7 +25,7 @@ export default function SellerNotificationCards({ state, loading }) {
                     </div>
                     <div className="flex flex-col">
                         <h1 className="text-[16px] text-[#344054]">Total Active Members</h1>
-                        <h2 className="text-[18px] font-semibold">200K</h2>
+                        <h2 className="text-[18px] font-semibold">{state?.users}</h2>
                     </div>
                 </div>
                 <div className="bg-white rounded-[20px] p-[20px] flex gap-[10px] custom-inset-shadow">
@@ -38,7 +38,7 @@ export default function SellerNotificationCards({ state, loading }) {
                     </div>
                     <div className="flex flex-col">
                         <h1 className="text-[16px] text-[#344054]">Total Issuer Members</h1>
-                        <h2 className="text-[18px] font-semibold">700K</h2>
+                        <h2 className="text-[18px] font-semibold">{state?.issuers}</h2>
                     </div>
 
                 </div>
@@ -51,8 +51,8 @@ export default function SellerNotificationCards({ state, loading }) {
 
                     </div>
                     <div className="flex flex-col">
-                        <h1 className="text-[16px] text-[#344054]">Growth Rate</h1>
-                        <h2 className="text-[18px] font-semibold">44%</h2>
+                        <h1 className="text-[16px] text-[#344054]">Total Buyer Members</h1>
+                        <h2 className="text-[18px] font-semibold">{state?.buyers}</h2>
                     </div>
                 </div>
 
