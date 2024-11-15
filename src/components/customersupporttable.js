@@ -216,7 +216,7 @@ export default function CustomerSupportTable() {
             {loading == true ? <div className="flex justify-center items-center">
                 <MoonLoader color="#6B33E3" size={100} />
             </div> : <div className="bg-white max-h-[700px]  overflow-y-auto p-[20px] rounded-[20px] shadow-md">
-                <div className="flex justify-between items-center mb-[20px]">
+                <div className="flex justify-between xl:flex-row flex-col items-center mb-[20px]">
 
                     <h1 className=" text-[24px] font-semibold">Support Requests</h1>
                     <div className='flex gap-[20px] items-center'>
@@ -268,77 +268,76 @@ export default function CustomerSupportTable() {
                     </div>
                 ) : (
                     <>
-                        {emails?.length > 0 ?
-                            <div>
-                                <table className="min-w-full xl:table hidden table-auto border-gray-300 border-collapse mt-4">
-                                    <thead>
-                                        <tr className="bg-[#FDFBFD]">
-                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Email ID</th>
-                                            <th className="p-[10px] text-left border-l border-t border-gray-300">From</th>
-                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Subject</th>
-                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Message ID</th>
-                                            <th className="p-[10px] text-left border-l border-t border-gray-300">Replied</th>
+                        {emails?.length > 0 ? <div>
+                            <table className="min-w-full xl:table hidden table-auto border-gray-300 border-collapse mt-4">
+                                <thead>
+                                    <tr className="bg-[#FDFBFD]">
+                                        <th className="p-[10px] text-left border-l border-t border-gray-300">Email ID</th>
+                                        <th className="p-[10px] text-left border-l border-t border-gray-300">From</th>
+                                        <th className="p-[10px] text-left border-l border-t border-gray-300">Subject</th>
+                                        <th className="p-[10px] text-left border-l border-t border-gray-300">Message ID</th>
+                                        <th className="p-[10px] text-left border-l border-t border-gray-300">Replied</th>
 
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {currentItems?.map((bond, index) => {
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {currentItems?.map((bond, index) => {
 
-                                            return (
-                                                <tr onClick={() => {
-                                                    navigate(`/Managecustomersupport?to=${extractEmail(bond?.from)}&subject=${bond?.subject}&id=${bond?.id}&messageId=${extractMessageId(bond?.messageId)}`)
-                                                }} key={bond.id} className="border-b cursor-pointer">
-                                                    <td className="p-[10px] border-l border-gray-300">{bond?.id}</td>
-                                                    <td className="p-[10px] border-l border-gray-300">{extractEmail(bond?.from)}</td>
-                                                    <td className="p-[10px] border-l border-gray-300">{bond?.subject}</td>
-                                                    <td className="p-[10px] border-l border-gray-300">{extractMessageId(bond?.messageId)}</td>
-                                                    <td className="p-[10px] border-l border-gray-300">
-                                                        {bond?.replied !== undefined && bond?.replied !== null
-                                                            ? bond.replied.toString()
-                                                            : 'Not found'}
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-
-                                    </tbody>
-                                </table>
-                                <div className='w-full xl:hidden block'>
-                                    <div className="xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
-                                        {currentItems?.map((bond, index) => (
-                                            <div key={bond.id} className="grid xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
-                                                <div className="flex flex-col gap-[10px]">
-                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Email ID</h1>
-                                                    <p className="text-[16px] font-semibold">{bond?.id?.slice(0, 6)}...</p>
-                                                </div>
-
-                                                <div className="flex flex-col gap-[10px]">
-                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">From</h1>
-                                                    <p className="text-[16px] font-semibold">{extractEmail(bond?.from)}</p>
-                                                </div>
-
-                                                <div className="flex flex-col gap-[10px]">
-                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Subject</h1>
-                                                    <p className="text-[16px] font-semibold">{bond?.subject}</p>
-                                                </div>
-                                                <div className="flex flex-col gap-[10px]">
-                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Message ID</h1>
-                                                    <p className="text-[16px] font-semibold">{extractMessageId(bond?.messageId)}</p>
-                                                </div>
-                                                <div className="flex flex-col gap-[10px] relative">
-                                                    <h1 className="text-[18px] font-semibold text-[#7E8183]">Replied</h1>
-                                                    <p className="text-[16px] font-semibold">{bond?.replied !== undefined && bond?.replied !== null
+                                        return (
+                                            <tr onClick={() => {
+                                                navigate(`/Managecustomersupport?to=${extractEmail(bond?.from)}&subject=${bond?.subject}&id=${bond?.id}&messageId=${extractMessageId(bond?.messageId)}`)
+                                            }} key={bond.id} className="border-b cursor-pointer">
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.id}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{extractEmail(bond?.from)}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{bond?.subject}</td>
+                                                <td className="p-[10px] border-l border-gray-300">{extractMessageId(bond?.messageId)}</td>
+                                                <td className="p-[10px] border-l border-gray-300">
+                                                    {bond?.replied !== undefined && bond?.replied !== null
                                                         ? bond.replied.toString()
-                                                        : 'Not found'}</p>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                                        : 'Not found'}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
 
+                                </tbody>
+                            </table>
+                            <div className='w-full xl:hidden block'>
+                                <div className="xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
+                                    {currentItems?.map((bond, index) => (
+                                        <div key={bond.id} className="grid xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
+                                            <div className="flex flex-col gap-[10px]">
+                                                <h1 className="text-[18px] font-semibold text-[#7E8183]">Email ID</h1>
+                                                <p className="text-[16px] font-semibold">{bond?.id?.slice(0, 6)}...</p>
+                                            </div>
+
+                                            <div className="flex flex-col gap-[10px]">
+                                                <h1 className="text-[18px] font-semibold text-[#7E8183]">From</h1>
+                                                <p className="text-[16px] font-semibold">{extractEmail(bond?.from)}</p>
+                                            </div>
+
+                                            <div className="flex flex-col gap-[10px]">
+                                                <h1 className="text-[18px] font-semibold text-[#7E8183]">Subject</h1>
+                                                <p className="text-[16px] font-semibold">{bond?.subject}</p>
+                                            </div>
+                                            <div className="flex flex-col gap-[10px]">
+                                                <h1 className="text-[18px] font-semibold text-[#7E8183]">Message ID</h1>
+                                                <p className="text-[16px] font-semibold">{extractMessageId(bond?.messageId)}</p>
+                                            </div>
+                                            <div className="flex flex-col gap-[10px] relative">
+                                                <h1 className="text-[18px] font-semibold text-[#7E8183]">Replied</h1>
+                                                <p className="text-[16px] font-semibold">{bond?.replied !== undefined && bond?.replied !== null
+                                                    ? bond.replied.toString()
+                                                    : 'Not found'}</p>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
-                            </div> : <div className='w-full flex items-center justify-center'>
-                                <p>No Record Found</p>
-                            </div>}
+
+                            </div>
+                        </div> : <div className='w-full flex items-center justify-center'>
+                            <p>No Record Found</p>
+                        </div>}
 
                         <div className="flex justify-end mt-4 space-x-2">
                             <button

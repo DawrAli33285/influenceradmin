@@ -201,7 +201,7 @@ export default function Paymentapprovaltable() {
             {loading == true ? <div className="flex justify-center items-center">
                 <MoonLoader color="#6B33E3" size={100} />
             </div> : <div className="bg-white max-h-[700px]  overflow-y-auto p-[20px] rounded-[20px] shadow-md">
-                <div className="flex justify-between items-center mb-[20px]">
+                <div className="flex justify-between xl:flex-row flex-col items-center mb-[20px]">
                     <h1 className=" text-[24px] font-semibold">Payment Managment</h1>
                     <div className='flex gap-[20px] items-center'>
                         <div>
