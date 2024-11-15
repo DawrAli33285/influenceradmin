@@ -225,6 +225,9 @@ export default function SellerAdminHeader({ children }) {
                         <div className="w-[80%] h-[100vh] flex flex-col fixed left-0 top-0 px-[20px] rounded-tr-[20px] rounded-br-[20px] py-[40px] justify-between bg-[#6B33E3]">
                             <div className="flex flex-col gap-[10px]">
                                 <h1 className="text-white text-[24px] font-semibold mb-[20px]">LOGOIPSUM</h1>
+                                <div className="absolute top-[4%] right-[5%]" onClick={() => setMenuPopup(!menupopup)}>
+                                    <svg width="30px" height="30px" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" fill="white"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill="white" d="M195.2 195.2a64 64 0 0 1 90.496 0L512 421.504 738.304 195.2a64 64 0 0 1 90.496 90.496L602.496 512 828.8 738.304a64 64 0 0 1-90.496 90.496L512 602.496 285.696 828.8a64 64 0 0 1-90.496-90.496L421.504 512 195.2 285.696a64 64 0 0 1 0-90.496z"></path></g></svg>
+                                </div>
                                 <Link
                                     to="/"
                                     className={`flex gap-[10px] rounded-[20px] items-center py-[10px] px-[20px] text-[18px] ${location.pathname === '/' ? 'bg-white text-[#2563EB]' : 'text-white'}`}
