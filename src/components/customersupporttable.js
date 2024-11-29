@@ -85,9 +85,9 @@ export default function Inbox() {
   return (
     <>
       <ToastContainer containerId={"inboxToast"} />
-      <div className="w-full flex h-screen">
-       
-        <div className="w-1/4 bg-gray-100 p-4 overflow-y-auto border-r">
+      <div className="w-full flex flex-col lg:flex-row h-screen">
+        {/* Sidebar */}
+        <div className="w-full lg:w-1/4 bg-gray-100 p-4 overflow-y-auto border-r">
           {buyerList.map((buyer, i) => (
             <div
               key={buyer._id}
@@ -102,15 +102,15 @@ export default function Inbox() {
           ))}
         </div>
 
-    
-        <div className="w-3/4 flex flex-col">
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
           {loading ? (
             <div className="flex justify-center items-center flex-1">
               <MoonLoader color="#6B33E3" size={100} />
             </div>
           ) : (
             <>
-            
+              {/* Header */}
               {currentBuyer && (
                 <div className="flex items-center gap-5 border-b p-4">
                   <img
@@ -124,35 +124,39 @@ export default function Inbox() {
                 </div>
               )}
 
-             
+              {/* Messages */}
               <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
-                {messages?.length>0?messages?.map((message, i) => (
-                  <div key={i} className="space-y-4">
-                    {message?.sendBy === "Admin" ? (
-                      <div className="flex justify-end">
-                        <div className="bg-green-500 text-white p-3 rounded-lg max-w-[75%]">
-                          <p>{message?.message}</p>
+                {messages?.length > 0 ? (
+                  messages?.map((message, i) => (
+                    <div key={i} className="space-y-4">
+                      {message?.sendBy === "Admin" ? (
+                        <div className="flex justify-end">
+                          <div className="bg-green-500 text-white p-3 rounded-lg max-w-[75%]">
+                            <p>{message?.message}</p>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex justify-start items-start space-x-3">
-                        <img
-                          src={avatar}
-                          alt="Support Avatar"
-                          className="rounded-full w-8 h-8 object-cover"
-                        />
-                        <div className="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-[75%]">
-                          <p>{message?.message}</p>
+                      ) : (
+                        <div className="flex justify-start items-start space-x-3">
+                          <img
+                            src={avatar}
+                            alt="Support Avatar"
+                            className="rounded-full w-8 h-8 object-cover"
+                          />
+                          <div className="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-[75%]">
+                            <p>{message?.message}</p>
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                )):<div className="w-full flex justify-center items-center">
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="w-full flex justify-center items-center">
                     <p>No messages found</p>
-                    </div>}
+                  </div>
+                )}
               </div>
 
-             
+              {/* Input */}
               <div className="flex items-center bg-gray-100 p-4 border-t">
                 <input
                   value={inputMessage}
