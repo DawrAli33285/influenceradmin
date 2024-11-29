@@ -50,7 +50,7 @@ export default function Inbox() {
   };
 
   useEffect(() => {
-    let socket = new io(`http://localhost:5000`);
+    let socket = new io(`https://influencerbackend-956183099426.us-central1.run.app`);
     socketRef.current = socket;
     socket.emit("adminconnected", { role: "admin" });
     socket.on("message", (data) => {
