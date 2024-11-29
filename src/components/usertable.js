@@ -124,6 +124,58 @@ setShowMenu(!showMenu)
 }
 
 const navigate=useNavigate();
+
+const suspendUser=async(id)=>{
+    try{
+let response=await axios.patch(`${BASE_URL}/suspendUser/${id}`)
+setUsers((prev)=>{
+    let old=[...prev]
+    let indexFound=old.findIndex(u=>u?._id==id)
+    let newUser={
+        ...old[indexFound],
+        status:"SUSPENDED"
+    }
+  old[indexFound]=newUser;
+  return old  
+})
+toast.success(response.data.message,{containerId:"usermanagement"})
+setShowMenu(!showMenu)
+    }catch(e){
+        if(e?.response?.data?.error){
+            toast.error(e?.response?.data?.error,{containerId:"usermanagement"})
+        }else{
+            toast.error("Client error please try again",{containerId:"usermanagement"})
+        }
+    }
+}
+
+
+
+
+
+const allowUser=async(id)=>{
+    try{
+let response=await axios.patch(`${BASE_URL}/approveUser/${id}`)
+setUsers((prev)=>{
+    let old=[...prev]
+    let indexFound=old.findIndex(u=>u?._id==id)
+    let newUser={
+        ...old[indexFound],
+        status:"ALLOWED"
+    }
+  old[indexFound]=newUser;
+  return old  
+})
+toast.success(response.data.message,{containerId:"usermanagement"})
+setShowMenu(!showMenu)
+    }catch(e){
+        if(e?.response?.data?.error){
+            toast.error(e?.response?.data?.error,{containerId:"usermanagement"})
+        }else{
+            toast.error("Client error please try again",{containerId:"usermanagement"})
+        }
+    }
+}
     return (
         <>
         
@@ -215,7 +267,7 @@ const navigate=useNavigate();
                                     <td className="p-[10px] border-l border-gray-300">{user?.country_code_id?.country_code + user?.mobile_number}</td>
 
                                     <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(user?.current_active_state)}`}>
-                                        {user?.current_active_state}
+                                        {user?.status}
                                     </td>
                                     <td className="p-[10px] border-l border-gray-300">{user?.createdAt && new Date(user?.createdAt).toLocaleDateString('en-US', {
                                         month: "long",
@@ -229,7 +281,8 @@ const navigate=useNavigate();
                                         {showMenu === index && (
                                             <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                 <ul>
-                                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">View</li>
+                                                    <li onClick={()=>suspendUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
+                                                    <li onClick={()=>allowUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Allow User</li>
                                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/userdetail/${user?.email}`}>Edit</Link></li>
                                                     <li onClick={() => deleteUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
                                                 </ul>

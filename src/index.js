@@ -62,31 +62,31 @@ const router = createBrowserRouter([
   },
   {
     path: "/supportlink",
-    element: <SellerAdminHeader><Supportlink/></SellerAdminHeader>,
+    element: <SellerAdminHeader><Supportlink /></SellerAdminHeader>,
   },
   {
     path: "/cloudflareVerificationServices",
-    element: <SellerAdminHeader><Cloudflareverification/></SellerAdminHeader>,
+    element: <SellerAdminHeader><Cloudflareverification /></SellerAdminHeader>,
   },
- 
+
   {
     path: "/phoneverificationservice",
-    element: <SellerAdminHeader><Phoneverificationservice/></SellerAdminHeader>,
+    element: <SellerAdminHeader><Phoneverificationservice /></SellerAdminHeader>,
   },
-   
+
   {
     path: "/Managecustomersupport",
-    element: <SellerAdminHeader><Managecustomersupport/></SellerAdminHeader>,
+    element: <SellerAdminHeader><Managecustomersupport /></SellerAdminHeader>,
   },
   {
     path: "/",
-    element: <SellerAdminHeader><Dashboard/></SellerAdminHeader>,
+    element: <SellerAdminHeader><Dashboard /></SellerAdminHeader>,
   },
   {
-    path:"/Sendemail",
-    element: <SellerAdminHeader><Sendemail/></SellerAdminHeader>,
+    path: "/Sendemail",
+    element: <SellerAdminHeader><Sendemail /></SellerAdminHeader>,
   }
- 
+
 ]);
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
