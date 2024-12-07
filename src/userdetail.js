@@ -181,26 +181,6 @@ export default function UserDetail() {
                             />
                         </div>
                         <div className="mt-[10px]">
-                            <label htmlFor="phonenumber" className="block text-xl font-semibold text-[#272226]">Phone Number</label>
-                            <input
-                                value={state.mobile_number}
-                                onChange={(e) => {
-                                    setState({
-                                        ...state,
-                                        mobile_number: e.target.value
-                                    })
-                                }}
-
-                                type="phonenumber"
-                                name="phonenumber"
-                                placeholder="Enter Last Name"
-                                className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
-                            />
-                        </div>
-                    </div>
-                    <div className="xl:grid grid-cols-2 mt-[30px] w-full flex gap-[20px] xl:flex-row flex-col">
-
-                        <div className="mt-[10px]">
                             <label htmlFor="status" className="block text-xl font-semibold text-[#272226]">Status</label>
                             <select
                                 value={state.current_active_state}
@@ -221,6 +201,7 @@ export default function UserDetail() {
                             </select>
                         </div>
                     </div>
+                    
                     <div className="xl:grid grid-cols-2  mt-[30px] w-full flex gap-[20px] xl:flex-row flex-col">
 
 

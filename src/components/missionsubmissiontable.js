@@ -4,12 +4,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import { BsThreeDotsVertical } from 'react-icons/bs';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import axios from 'axios';
 import { BASE_URL } from '../base_url';
 
-export default function BondTable() {
+export default function MissionSubmissionTable() {
     const [selectedMonth, setSelectedMonth] = useState('default');
     const [suspendpopup, setSuspendPopup] = useState(false)
     const [loading, setLoading] = useState(true);
@@ -37,7 +37,6 @@ export default function BondTable() {
     const [bondtosuspend, setBondToSuspend] = useState();
     const [reason, setReason] = useState("");
     const suspendpopupfunction = (id) => {
-        setShowMenu(!showMenu)
         setSuspendPopup(!suspendpopup);
         setBondToSuspend(id)
     }
@@ -48,7 +47,7 @@ export default function BondTable() {
     const handleConfirm = () => {
         setSuspendPopup(!suspendpopup);
         const bondid = bondtosuspend
-        updateStatus("REJECTED", bondid,reason)
+        updateStatus("REJECTED", bondid)
         setBondToSuspend(null)
     };
 
@@ -83,14 +82,14 @@ export default function BondTable() {
 
 
     const filteredData = bonds?.filter((item) => {
-        const matchesSearch = item?.title?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-            item?._id?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
-            item?.description?.toLowerCase()?.includes(searchQuery?.toLowerCase());
+        const matchesSearch = item?.bond_id?.title?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+            item?.bond_id?._id?.toLowerCase()?.includes(searchQuery?.toLowerCase()) ||
+            item?.bond_id?.description?.toLowerCase()?.includes(searchQuery?.toLowerCase());
 
-        const matchesStatus = filters.status ? item.status === filters.status : true;
+        const matchesStatus = filters.status ? item?.bond_id?.status === filters.status : true;
 
 
-        const matchesBondType = filters.bondType ? item.bondType === filters.bondType : true;
+        const matchesBondType = filters.bondType ? item?.bond_id?.bondType === filters.bondType : true;
         const checkAmountRange = (range, amount) => {
             switch (range) {
                 case 'Under $1,000':
@@ -110,7 +109,7 @@ export default function BondTable() {
             }
         };
 
-        const matchesAmountRange = filters.amountRange ? checkAmountRange(filters.amountRange, item.bond_price * item.total_bonds) : true;
+        const matchesAmountRange = filters.amountRange ? checkAmountRange(filters.amountRange, item?.bond_id?.bond_price * item?.bond_id?.total_bonds) : true;
 
         return matchesSearch && matchesStatus && matchesBondType && matchesAmountRange;
     });
@@ -119,7 +118,7 @@ export default function BondTable() {
 
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const currentItems = filteredData?.slice(indexOfFirstItem, indexOfLastItem);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
@@ -142,10 +141,13 @@ export default function BondTable() {
 
     const getBonds = async () => {
         try {
-            let response = await axios.get(`${BASE_URL}/get-bonds`)
-            setLoading(false)
-            setBonds(response.data.bonds)
 
+            let response = await axios.get(`${BASE_URL}/getSubmittedBonds`)
+          
+            setLoading(false)
+           
+            setBonds(response.data.missionSubmissions)
+            console.log('response one')
             console.log(response.data)
         } catch (e) {
             if (e?.response?.data?.error) {
@@ -175,9 +177,9 @@ export default function BondTable() {
         }
     }
 
-    const updateStatus = async (status, id,description) => {
+    const updateStatus = async (status, id) => {
         try {
-            let response = await axios.patch(`${BASE_URL}/update-status/${status}/${id}/${description}`)
+            let response = await axios.patch(`${BASE_URL}/update-status/${status}/${id}`)
             setBonds((prev) => {
                 let old = [...prev]
                 let getIndex = old.findIndex(u => u?._id == id)
@@ -236,7 +238,7 @@ export default function BondTable() {
             }
         }
     }
-const navigate=useNavigate();
+
     return (
         <>
             <ToastContainer containerId="bondmanagement" limit={1} />
@@ -316,7 +318,7 @@ const navigate=useNavigate();
                                 <thead>
                                     <tr className="bg-[#FDFBFD]">
                                         <th className="p-[10px] text-left border-l border-t border-gray-300">Bond ID</th>
-                                        <th className="p-[10px] text-left border-l border-t border-gray-300">Name</th>
+                                        <th className="p-[10px] text-left border-l border-t border-gray-300">Issuer Name</th>
                                         <th className="p-[10px] text-left border-l border-t border-gray-300">Unit Price</th>
                                         <th className="p-[10px] text-left border-l border-t border-gray-300">Validity Number</th>
                                         <th className="p-[10px] text-left border-l border-t border-gray-300">Issuer</th>
@@ -328,14 +330,14 @@ const navigate=useNavigate();
                                 <tbody>
                                     {currentItems?.map((bond, index) => (
                                         <tr key={bond.id} className="border-b">
-                                            <td className="p-[10px] border-l border-gray-300">{bond?._id}</td>
-                                            <td className="p-[10px] border-l border-gray-300">{bond?.title}</td>
-                                            <td className="p-[10px] border-l border-gray-300">{bond?.bond_price}</td>
-                                            <td className="p-[10px] border-l border-gray-300">{bond?.validity_number}</td>
+                                            <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?._id}</td>
+                                            <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.title}</td>
+                                            <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.bond_price}</td>
+                                            <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.validity_number}</td>
                                             <td className="p-[10px] border-l border-gray-300">{bond?.issuer_id?.user_id?.username}</td>
-                                            <td className="p-[10px] border-l border-gray-300">{bond?.bond_price * bond?.total_bonds}</td>
-                                            <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(bond?.status)}`}>
-                                                {bond.status}
+                                            <td className="p-[10px] border-l border-gray-300">{bond?.bond_id?.bond_issuerance_amount}</td>
+                                            <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(bond?.bond_id?.status)}`}>
+                                                {bond.bond_id?.status}
                                             </td>
                                             <td className="p-[10px] border-l border-r border-gray-300 relative">
                                                 <button onClick={() => handleActionClick(index)} className="focus:outline-none">
@@ -344,17 +346,10 @@ const navigate=useNavigate();
                                                 {showMenu === index && (
                                                     <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                         <ul>
+                                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                                                <Link to={`/viemissionSubmission/${bond?.bond_id?._id}`}>View</Link>
+                                                            </li>
                                                             
-                                                            <li onClick={() => {
-                                                                updateStatus("APPROVED", bond?._id,"new")
-                                                            }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
-                                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/bond-detail/${bond?._id}`}>Edit</Link></li>
-                                                            <li onClick={() => {
-                                                                suspendpopupfunction(bond?._id)
-                                                            }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
-                                                            <li className="px-4 py-2 hover:bg-gray-100 text-red-500 cursor-pointer" onClick={() => {
-                                                                navigate(`/singleBond/${bond?._id}`)
-                                                            }}>View</li>
                                                         </ul>
                                                     </div>
                                                 )}
@@ -369,22 +364,22 @@ const navigate=useNavigate();
                                         <div key={bond.id} className="grid xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
                                             <div className="flex flex-col gap-[10px]">
                                                 <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond ID</h1>
-                                                <p className="text-[16px] font-semibold">{bond?._id?.slice(0, 6)}...</p>
+                                                <p className="text-[16px] font-semibold">{bond?.bond_id?._id?.slice(0, 6)}...</p>
                                             </div>
 
                                             <div className="flex flex-col gap-[10px]">
                                                 <h1 className="text-[18px] font-semibold text-[#7E8183]">Name</h1>
-                                                <p className="text-[16px] font-semibold">{bond?.title}</p>
+                                                <p className="text-[16px] font-semibold">{bond?.bond_id?.title}</p>
                                             </div>
 
                                             <div className="flex flex-col gap-[10px]">
                                                 <h1 className="text-[18px] font-semibold text-[#7E8183]">Unit Price</h1>
-                                                <p className="text-[16px] font-semibold">{bond?.bond_price}</p>
+                                                <p className="text-[16px] font-semibold">{bond?.bond_id?.bond_price}</p>
                                             </div>
 
                                             <div className="flex flex-col gap-[10px]">
                                                 <h1 className="text-[18px] font-semibold text-[#7E8183]">Validity Number</h1>
-                                                <p className="text-[16px] font-semibold">{bond?.validity_number}</p>
+                                                <p className="text-[16px] font-semibold">{bond?.bond_id?.validity_number}</p>
                                             </div>
 
                                             <div className="flex flex-col gap-[10px]">
@@ -394,12 +389,12 @@ const navigate=useNavigate();
 
                                             <div className="flex flex-col gap-[10px]">
                                                 <h1 className="text-[18px] font-semibold text-[#7E8183]">Bond Amount</h1>
-                                                <p className="text-[16px] font-semibold">{bond?.bond_price * bond?.total_bonds}</p>
+                                                <p className="text-[16px] font-semibold">{bond?.bond_id?.bond_issuerance_amount}</p>
                                             </div>
 
                                             <div className="flex flex-col gap-[10px]">
                                                 <h1 className="text-[18px] font-semibold text-[#7E8183]">Status</h1>
-                                                <p className="text-[16px] font-semibold">{bond?.status}</p>
+                                                <p className="text-[16px] font-semibold">{bond?.bond_id?.status}</p>
                                             </div>
 
 
@@ -414,28 +409,10 @@ const navigate=useNavigate();
                                                 {showMenu === index && (
                                                     <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                         <ul>
-                                                           
-                                                            <li
-                                                                onClick={() => updateStatus("APPROVED", bond?._id,"new")}
-                                                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                                            >
-                                                                Approve
-                                                            </li>
                                                             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                                                                <Link to={`/bond-detail/${bond?._id}`}>Edit</Link>
+                                                                <Link to={`/viemissionSubmission/${bond?.bond_id?._id}`}>View</Link>
                                                             </li>
-                                                            <li
-                                                                onClick={() => { suspendpopupfunction(bond?._id) }}
-                                                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                                                            >
-                                                                Suspend
-                                                            </li>
-                                                            <li
-                                                                className="px-4 py-2 hover:bg-gray-100 text-red-500 cursor-pointer"
-                                                                onClick={() =>navigate(`/singleBond/${bond?._id}`)}
-                                                            >
-                                                                View
-                                                            </li>
+                                                           
                                                         </ul>
                                                     </div>
                                                 )}

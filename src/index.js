@@ -23,6 +23,9 @@ import Managecustomersupport from './Managecustomersupport';
 import Paymentapproval from './Paymentapproval';
 import Dashboard from './dashboard';
 import Sendemail from './components/sendEmail';
+import ViewBond from './viewbond';
+import MissionSubmission from './missionsubmission';
+import SingleBond from './singleBond';
 const router = createBrowserRouter([
   {
     path: "/usermanagment",
@@ -85,6 +88,18 @@ const router = createBrowserRouter([
   {
     path: "/Sendemail",
     element: <SellerAdminHeader><Sendemail /></SellerAdminHeader>,
+  },
+  {
+    path: "/missionsubmission",
+    element: <SellerAdminHeader><MissionSubmission /></SellerAdminHeader>,
+  },
+  {
+    path: "/singleBond/:id",
+    element: <SellerAdminHeader><SingleBond /></SellerAdminHeader>,
+  },
+  {
+    path: "/viemissionSubmission/:id",
+    element: <SellerAdminHeader><ViewBond /></SellerAdminHeader>,
   }
 
 ]);

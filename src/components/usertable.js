@@ -251,8 +251,7 @@ setShowMenu(!showMenu)
                                 <th className="p-[10px] text-left border-l border-t border-gray-300">User ID</th>
                                 <th className="p-[10px] text-left border-l border-t border-gray-300">Name</th>
                                 <th className="p-[10px] text-left border-l border-t border-gray-300">Email</th>
-                                <th className="p-[10px] text-left border-l border-t border-gray-300">Phone Number</th>
-
+                      
                                 <th className="p-[10px] text-left border-l border-t border-gray-300">Status</th>
                                 <th className="p-[10px] text-left border-l border-t border-r border-gray-300">Registration Date</th>
                                 <th className="p-[10px] text-left border-l border-t border-r border-gray-300">Action</th>
@@ -264,8 +263,7 @@ setShowMenu(!showMenu)
                                     <td className="p-[10px] border-l border-gray-300">{(index + 1)?.toString()}</td>
                                     <td className="p-[10px] border-l border-gray-300">{user?.username}</td>
                                     <td className="p-[10px] border-l border-gray-300">{user?.email}</td>
-                                    <td className="p-[10px] border-l border-gray-300">{user?.country_code_id?.country_code + user?.mobile_number}</td>
-
+                          
                                     <td className={`p-[10px] border-l border-gray-300 ${getStatusClass(user?.current_active_state)}`}>
                                         {user?.status}
                                     </td>
@@ -284,7 +282,7 @@ setShowMenu(!showMenu)
                                                     <li onClick={()=>suspendUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
                                                     <li onClick={()=>allowUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Allow User</li>
                                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/userdetail/${user?.email}`}>Edit</Link></li>
-                                                    <li onClick={() => deleteUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
+                                                    
                                                 </ul>
                                             </div>
                                         )}
@@ -314,12 +312,7 @@ setShowMenu(!showMenu)
                                         </p>
                                     </div>
 
-                                    <div className="flex flex-col gap-[10px]">
-                                        <h1 className="text-[18px] font-semibold text-[#7E8183]">Phone Number</h1>
-                                        <p className="text-[16px] font-semibold">
-                                            {user?.country_code_id?.country_code.slice(0, 3)}{user?.mobile_number?.slice(0, 3)} {/* Trim phone number to 6 characters */}
-                                        </p>
-                                    </div>
+                                  
 
                                     <div className="flex flex-col gap-[10px]">
                                         <h1 className="text-[18px] font-semibold text-[#7E8183]">Status</h1>
@@ -345,9 +338,10 @@ setShowMenu(!showMenu)
                                         {showMenu === index && (
                                             <div className="absolute top-full right-0 mt-2 w-[150px] bg-white border border-gray-300 rounded-lg shadow-md z-[999]">
                                                 <ul>
-                                                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">View</li>
+                                                <li onClick={()=>suspendUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
+                                                    <li onClick={()=>allowUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Allow User</li>
                                                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/userdetail/${user?.email}`}>Edit</Link></li>
-                                                    <li onClick={() => deleteUser(user?._id)} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Delete</li>
+                                                    
                                                 </ul>
                                             </div>
                                         )}
