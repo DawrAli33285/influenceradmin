@@ -204,13 +204,15 @@ export default function SellerAdminHeader({ children }) {
                         <div className="xl:hidden block hover:cursor-pointer" onClick={() => setMenuPopup(!menupopup)}>
                             <svg width="30px" height="30px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 12H20" stroke="#2563EB" stroke-width="2" stroke-linecap="round"></path> <path d="M5 17H20" stroke="#2563EB" stroke-width="2" stroke-linecap="round"></path> <path d="M5 7H20" stroke="#2563EB" stroke-width="2" stroke-linecap="round"></path> </g></svg>
                         </div>
-                        <h1 className="text-[#2563EB] text-[24px] font-semibold flex ">
-                            {location.pathname
-                                .replace('/', '')
-                                .split('/')[0]
-                                .charAt(0).toUpperCase() +
-                                location.pathname.slice(2)}
-                        </h1>
+                        <h1 className="text-[#2563EB] text-[10px] sm:text-[16px] font-semibold flex break-words sm:truncate">
+    {location.pathname
+        .replace('/', '')
+        .split('/')[0]
+        .charAt(0).toUpperCase() +
+        location.pathname.slice(2)}
+</h1>
+
+
                         <div className="flex items-center gap-[10px]">
                             <div
                                 className="rounded-[100%] w-[40px] h-[40px] xl:mr-[40px] relative"
