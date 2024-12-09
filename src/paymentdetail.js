@@ -576,7 +576,7 @@ setTimeout(()=>{
                         ))}
                     </div>
                 </div> */}
-                        {/* table */}
+                        
                         <div>
                             {dummyDatatbl.length > 0 ? <table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
                                 <thead>

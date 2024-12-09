@@ -142,12 +142,17 @@ console.log(state)
         <>
             <ToastContainer containerId={"bonddetail"} />
             <div className="h-[100vh]">
+            
                 <div className="w-full min-h-[500px]  overflow-x-auto bg-white rounded-[20px] mt-[20px] px-[20px] py-[40px]">
                 {loading?   <div className="flex justify-center items-center">
                         <MoonLoader color="#6B33E3" size={100} />
                     </div>:<>
-                   {/* first section */}
+                 
                    <div className="flex flex-col gap-[20px] w-full xl:px-[40px]">
+                   <svg onClick={()=>{
+                    navigate(-1)
+                   }} className="cursor-pointer" width={35} height={35} fill="#000000" viewBox="0 0 52 52" data-name="Layer 1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M50,24H6.83L27.41,3.41a2,2,0,0,0,0-2.82,2,2,0,0,0-2.82,0l-24,24a1.79,1.79,0,0,0-.25.31A1.19,1.19,0,0,0,.25,25c0,.07-.07.13-.1.2l-.06.2a.84.84,0,0,0,0,.17,2,2,0,0,0,0,.78.84.84,0,0,0,0,.17l.06.2c0,.07.07.13.1.2a1.19,1.19,0,0,0,.09.15,1.79,1.79,0,0,0,.25.31l24,24a2,2,0,1,0,2.82-2.82L6.83,28H50a2,2,0,0,0,0-4Z"></path></g></svg>
+
                         <h2 className="text-[24px] font-semibold">Clean Water Initiative</h2>
                         <div className="grid xl:grid-cols-4 grid-cols-2 gap-[20px]">
                             <div className="flex flex-col gap-[10px]">
@@ -233,7 +238,14 @@ console.log(state)
                                         }}
                                         className="mt-4 block w-full px-3 py-4 border rounded-[20px] border-gray-300 focus:outline-none focus:ring focus:border-blue-500"
                                     /> :
-                                        <p className="text-[16px] font-semibold">{state?.mission?.task_type}</p>
+                                    <p 
+                                    className="text-[16px] font-semibold max-h-[200px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-200 
+                                               sm:max-h-[150px] lg:max-h-[300px] px-2"
+                                >
+                                    {state?.mission?.description}
+                                </p>
+                                
+                                
                                 }
                             </div>
 
@@ -254,9 +266,9 @@ console.log(state)
 >
     <option value="">Select validity</option>
     {Array.from({ length: 16 }, (_, index) => {
-        const number = index + 2; // Start from 2
+        const number = index + 2; 
         return (
-            number <= 18 && ( // Restrict range to 18
+            number <= 18 && ( 
                 <option key={number} value={number}>
                     {number} months
                 </option>
@@ -322,7 +334,7 @@ console.log(state)
                         ))}
                     </div>
                 </div> */}
-                    {/* table */}
+                  
                     <div>
                       {state?.transaction?.length>0?<table className="min-w-full table-auto border-gray-300 border-collapse mt-4">
                             <thead>
@@ -352,13 +364,10 @@ console.log(state)
                                     </tr>
                                 ))}
                             </tbody>
-                        </table>:<div className="flex justify-center items-center w-full">
-                             <p>No Record Found</p>
-
-                            </div>
+                        </table>:''
                             }
                         <div className='flex justify-end w-full gap-[20px] mt-[40px]'>
-                            {!isedit?<button className='border rounded-[20px] px-[20px] py-[10px] text-[#6b33e3] border-[#6b33e3]' onClick={edituser}>Edit Bond</button>:<button className='border rounded-[20px] px-[20px] py-[10px] text-[#6b33e3] border-[#6b33e3]' onClick={editnow}>Update Bond</button>}
+                            {/* {!isedit?<button className='border rounded-[20px] px-[20px] py-[10px] text-[#6b33e3] border-[#6b33e3]' onClick={edituser}>Edit Bond</button>:<button className='border rounded-[20px] px-[20px] py-[10px] text-[#6b33e3] border-[#6b33e3]' onClick={editnow}>Update Bond</button>} */}
                             {!isedit?<button onClick={()=>{
                                 navigate(-1)
                             }} className='border rounded-[20px] px-[20px] py-[10px] text-red-500 border-red-500' >Cancel</button>:<button onClick={()=>{

@@ -86,7 +86,7 @@ export default function Inbox() {
     <>
       <ToastContainer containerId={"inboxToast"} />
       <div className="w-full flex flex-col lg:flex-row h-screen">
-        {/* Sidebar */}
+   
         <div className="w-full lg:w-1/4 bg-gray-100 p-4 overflow-y-auto border-r">
           {buyerList.map((buyer, i) => (
             <div
@@ -102,7 +102,7 @@ export default function Inbox() {
           ))}
         </div>
 
-        {/* Main Content */}
+        
         <div className="flex-1 flex flex-col">
           {loading ? (
             <div className="flex justify-center items-center flex-1">
@@ -110,7 +110,7 @@ export default function Inbox() {
             </div>
           ) : (
             <>
-              {/* Header */}
+          
               {currentBuyer && (
                 <div className="flex items-center gap-5 border-b p-4">
                   <img
@@ -124,7 +124,7 @@ export default function Inbox() {
                 </div>
               )}
 
-              {/* Messages */}
+            
               <div className="flex-1 overflow-y-auto p-6 bg-gray-50">
                 {messages?.length > 0 ? (
                   messages?.map((message, i) => (
@@ -156,7 +156,7 @@ export default function Inbox() {
                 )}
               </div>
 
-              {/* Input */}
+         
               <div className="flex items-center bg-gray-100 p-4 border-t">
                 <input
                   value={inputMessage}

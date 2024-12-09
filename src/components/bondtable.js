@@ -348,7 +348,7 @@ const navigate=useNavigate();
                                                             <li onClick={() => {
                                                                 updateStatus("APPROVED", bond?._id,"new")
                                                             }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Approve</li>
-                                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/bond-detail/${bond?._id}`}>Edit</Link></li>
+                                                            {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer"><Link to={`/bond-detail/${bond?._id}`}>Edit</Link></li> */}
                                                             <li onClick={() => {
                                                                 suspendpopupfunction(bond?._id)
                                                             }} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">Suspend</li>
@@ -421,9 +421,9 @@ const navigate=useNavigate();
                                                             >
                                                                 Approve
                                                             </li>
-                                                            <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                                                            {/* <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                                                                 <Link to={`/bond-detail/${bond?._id}`}>Edit</Link>
-                                                            </li>
+                                                            </li> */}
                                                             <li
                                                                 onClick={() => { suspendpopupfunction(bond?._id) }}
                                                                 className="px-4 py-2 hover:bg-gray-100 cursor-pointer"

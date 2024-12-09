@@ -260,7 +260,7 @@ setShowMenu(!showMenu)
                         <tbody>
                             {currentItems?.map((user, index) => (
                                 <tr key={user?._id} className="border-b">
-                                    <td className="p-[10px] border-l border-gray-300">{(index + 1)?.toString()}</td>
+                                    <td className="p-[10px] border-l border-gray-300">{user?._id}</td>
                                     <td className="p-[10px] border-l border-gray-300">{user?.username}</td>
                                     <td className="p-[10px] border-l border-gray-300">{user?.email}</td>
                           
@@ -297,7 +297,7 @@ setShowMenu(!showMenu)
                                 <div key={user.id} className="grid xl:grid-cols-4 grid-cols-2 gap-[20px] border-b border-gray-300 py-4">
                                     <div className="flex flex-col gap-[10px]">
                                         <h1 className="text-[18px] font-semibold text-[#7E8183]">User ID</h1>
-                                        <p className="text-[16px] font-semibold">{(index + 1)?.toString()}</p>
+                                        <p className="text-[16px] font-semibold">{user?._id}</p>
                                     </div>
 
                                     <div className="flex flex-col gap-[10px]">

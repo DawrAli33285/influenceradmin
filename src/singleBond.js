@@ -91,7 +91,7 @@ export default function SingleBond() {
                                 <h1 className="text-[24px] font-semibold">Mission Submission</h1>
                                 <p className="text-[18px] text-[#74767E]">{state?.title || "Untitled"}</p>
 
-                                {/* Display photos instead of video */}
+                               
                                 <div className="mt-[20px] grid grid-cols-2 gap-4">
                                     {state?.photos && state.photos.length > 0 ? (
                                         state.photos.map((photo, index) => (
